@@ -59,6 +59,8 @@ export default async function AnalyzePage({
                   original={result.imagePath}
                   segmented={result.segmentedPath}
                   heatmap={result.heatmapPath}
+                  subjectBox={result.subjectBox}
+                  featureRegions={result.featureRegions}
                 />
               </Frame>
             </div>
@@ -82,6 +84,16 @@ export default async function AnalyzePage({
                   )}
                 </div>
               </div>
+              {result.outOfDistribution && (
+                <div className="border-l-2 border-vermilion bg-paper-warm px-4 py-3">
+                  <div className="font-serif text-[13px] tracking-[0.22em] text-vermilion-deep">
+                    超出知识库范围
+                  </div>
+                  <p className="mt-1 font-sans text-[12px] leading-[1.8] text-ink-soft">
+                    本样本可能不属于当前 7 物种（马 / 黄牛 / 水牛 / 鹿 / 羊 / 猪 / 狗）任一类。建议送专家核验后再录入。
+                  </p>
+                </div>
+              )}
               <Frame tone="paper" className="p-6">
                 <div className="font-serif text-[13px] tracking-[0.28em] text-vermilion">
                   鉴定元数据
@@ -101,6 +113,18 @@ export default async function AnalyzePage({
                   <dd className="font-mono text-ink-soft uppercase">
                     {result.provider}
                   </dd>
+                  <dt className="text-ink-muted tracking-[0.2em]">检索</dt>
+                  <dd className="font-mono text-ink-soft uppercase">
+                    {result.retrievalMode}
+                  </dd>
+                  {result.channelVerdicts?.thinking && (
+                    <>
+                      <dt className="text-ink-muted tracking-[0.2em]">通道</dt>
+                      <dd className="font-mono text-ink-soft">
+                        realtime · thinking
+                      </dd>
+                    </>
+                  )}
                 </dl>
               </Frame>
             </div>
@@ -157,8 +181,21 @@ export default async function AnalyzePage({
             >
               思维链
             </SectionTitle>
-            <div className="mt-8">
-              <ReasoningPanel reasoning={result.reasoning} />
+            <div className="mt-8 flex flex-col gap-6">
+              <div>
+                <div className="mb-3 font-serif text-[12px] tracking-[0.3em] text-bronze-dark">
+                  实时通道 · Realtime
+                </div>
+                <ReasoningPanel reasoning={result.reasoning} />
+              </div>
+              {result.thinkingReasoning && (
+                <div>
+                  <div className="mb-3 font-serif text-[12px] tracking-[0.3em] text-vermilion">
+                    精推通道 · Thinking
+                  </div>
+                  <ReasoningPanel reasoning={result.thinkingReasoning} />
+                </div>
+              )}
             </div>
           </section>
 

@@ -55,7 +55,7 @@ export async function analyzeBoneAction(formData: FormData): Promise<void> {
 
   const provider = selectProvider();
 
-  const retrieved = retrieveKnowledge(
+  const retrieved = await retrieveKnowledge(
     [
       hints ?? "",
       "动物骨骼种属 形态 结构 尺寸 表面 截面 痕迹 鉴定",
@@ -73,7 +73,7 @@ export async function analyzeBoneAction(formData: FormData): Promise<void> {
       mime: segment.ext === "jpg" ? "image/jpeg" : "image/png",
       hints,
     },
-    retrieved,
+    retrieved.cards,
   );
   const processingMs = Date.now() - started;
 
@@ -83,12 +83,18 @@ export async function analyzeBoneAction(formData: FormData): Promise<void> {
     imagePath,
     segmentedPath,
     heatmapPath: partial.heatmapPath,
+    subjectBox: partial.subjectBox,
+    featureRegions: partial.featureRegions,
     verdict: partial.verdict,
     dimensions: partial.dimensions,
     evidence: partial.evidence,
     reasoning: partial.reasoning,
+    thinkingReasoning: partial.thinkingReasoning,
+    outOfDistribution: partial.outOfDistribution,
+    channelVerdicts: partial.channelVerdicts,
     knowledgeCards: partial.knowledgeCards,
     provider: provider.name,
+    retrievalMode: retrieved.mode,
     processingMs,
   };
 
@@ -125,7 +131,7 @@ export async function analyzeDemoAction(formData: FormData): Promise<void> {
   );
 
   const provider = selectProvider();
-  const retrieved = retrieveKnowledge(
+  const retrieved = await retrieveKnowledge(
     [
       `样本 ${demoId}`,
       "动物骨骼种属 形态 结构 尺寸 表面 截面 痕迹 鉴定",
@@ -143,7 +149,7 @@ export async function analyzeDemoAction(formData: FormData): Promise<void> {
       mime: segment.ext === "jpg" ? "image/jpeg" : "image/png",
       hints: `来自示例样本库：${demoId}`,
     },
-    retrieved,
+    retrieved.cards,
   );
   const processingMs = Date.now() - started;
 
@@ -153,12 +159,18 @@ export async function analyzeDemoAction(formData: FormData): Promise<void> {
     imagePath,
     segmentedPath,
     heatmapPath: partial.heatmapPath,
+    subjectBox: partial.subjectBox,
+    featureRegions: partial.featureRegions,
     verdict: partial.verdict,
     dimensions: partial.dimensions,
     evidence: partial.evidence,
     reasoning: partial.reasoning,
+    thinkingReasoning: partial.thinkingReasoning,
+    outOfDistribution: partial.outOfDistribution,
+    channelVerdicts: partial.channelVerdicts,
     knowledgeCards: partial.knowledgeCards,
     provider: provider.name,
+    retrievalMode: retrieved.mode,
     processingMs,
   };
 

@@ -22,12 +22,14 @@ async function main() {
   const segPath = await saveImageBuffer(id, "segmented", seg.buffer, seg.ext);
   console.log(`[3/6] saved images -> ${origPath} / ${segPath}`);
 
-  const retrieved = retrieveKnowledge(
+  const retrieved = await retrieveKnowledge(
     "骨骼 形态 结构 尺寸 表面 截面 痕迹 鉴定 掌骨 距骨 股骨",
     8,
   );
-  console.log(`[4/6] RAG retrieved ${retrieved.length} knowledge cards, top:`);
-  for (const c of retrieved.slice(0, 3)) {
+  console.log(
+    `[4/6] RAG retrieved ${retrieved.cards.length} knowledge cards (mode=${retrieved.mode}), top:`,
+  );
+  for (const c of retrieved.cards.slice(0, 3)) {
     console.log(`      - ${c.species}·${c.position}: ${c.summary}`);
   }
 
@@ -43,7 +45,7 @@ async function main() {
       mime: seg.ext === "jpg" ? "image/jpeg" : "image/png",
       hints: "测试输入",
     },
-    retrieved,
+    retrieved.cards,
   );
   const ms = Date.now() - t0;
 
@@ -53,12 +55,18 @@ async function main() {
     imagePath: origPath,
     segmentedPath: segPath,
     heatmapPath: partial.heatmapPath,
+    subjectBox: partial.subjectBox,
+    featureRegions: partial.featureRegions,
     verdict: partial.verdict,
     dimensions: partial.dimensions,
     evidence: partial.evidence,
     reasoning: partial.reasoning,
+    thinkingReasoning: partial.thinkingReasoning,
+    outOfDistribution: partial.outOfDistribution,
+    channelVerdicts: partial.channelVerdicts,
     knowledgeCards: partial.knowledgeCards,
     provider: provider.name,
+    retrievalMode: retrieved.mode,
     processingMs: ms,
   };
 
