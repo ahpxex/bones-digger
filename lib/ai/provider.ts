@@ -11,7 +11,21 @@ export interface AnalyzeInput {
 
 export interface Provider {
   name: "mock" | "dashscope";
-  analyze(input: AnalyzeInput, retrieved: KnowledgeCard[]): Promise<Omit<AnalysisResult, "id" | "imagePath" | "segmentedPath" | "timestamp" | "provider" | "processingMs">>;
+  analyze(
+    input: AnalyzeInput,
+    retrieved: KnowledgeCard[],
+  ): Promise<
+    Omit<
+      AnalysisResult,
+      | "id"
+      | "imagePath"
+      | "segmentedPath"
+      | "timestamp"
+      | "provider"
+      | "processingMs"
+      | "retrievalMode"
+    >
+  >;
 }
 
 export function selectProvider(): Provider {

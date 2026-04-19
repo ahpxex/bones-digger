@@ -1,5 +1,6 @@
 import { KNOWLEDGE_CARDS } from "@/lib/knowledge/bones";
 import type { KnowledgeCard } from "@/lib/types";
+import { retrieveByEmbedding } from "./embedding";
 
 function tokenize(s: string): string[] {
   return s
@@ -31,10 +32,7 @@ function score(query: string, card: KnowledgeCard): number {
   return hit / lenPenalty;
 }
 
-export function retrieveKnowledge(
-  query: string,
-  topK = 8,
-): KnowledgeCard[] {
+export function retrieveByBigram(query: string, topK = 8): KnowledgeCard[] {
   const scored = KNOWLEDGE_CARDS.map((card) => ({
     card,
     s: score(query, card),
@@ -46,4 +44,22 @@ export function retrieveKnowledge(
     return KNOWLEDGE_CARDS.slice(0, topK);
   }
   return scored.slice(0, topK).map((x) => x.card);
+}
+
+export interface RetrievalResult {
+  cards: KnowledgeCard[];
+  mode: "qwen3-embedding" | "bigram";
+}
+
+export async function retrieveKnowledge(
+  query: string,
+  topK = 8,
+): Promise<RetrievalResult> {
+  if (process.env.AI_PROVIDER === "dashscope") {
+    const viaEmbedding = await retrieveByEmbedding(query, topK);
+    if (viaEmbedding && viaEmbedding.length > 0) {
+      return { cards: viaEmbedding, mode: "qwen3-embedding" };
+    }
+  }
+  return { cards: retrieveByBigram(query, topK), mode: "bigram" };
 }

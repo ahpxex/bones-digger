@@ -8,6 +8,7 @@ const SPECIES_LATIN: Record<Species, string> = {
   羊: "Ovis / Capra",
   猪: "Sus scrofa",
   狗: "Canis lupus familiaris",
+  未知: "incertae sedis",
 };
 
 const POSITION_LATIN: Partial<Record<BonePosition, string>> = {
