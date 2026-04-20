@@ -27,7 +27,8 @@ export type BonePosition =
   | "枢椎"
   | "肩胛骨"
   | "肱骨"
-  | "其他";
+  | "其他"
+  | "未知";
 
 export type AnalysisDimension =
   | "整体形态"

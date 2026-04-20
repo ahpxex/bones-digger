@@ -72,7 +72,8 @@ async function buildKnowledgeIndex(): Promise<CachedCard[]> {
 
   kbBuildPromise = (async () => {
     const texts = KNOWLEDGE_CARDS.map(cardToText);
-    const batchSize = 16;
+    // DashScope text-embedding-v4 caps batch at 10 per call
+    const batchSize = 10;
     const vectors: Float32Array[] = new Array(texts.length);
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize);
