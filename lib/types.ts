@@ -98,6 +98,8 @@ export interface AnalysisResult {
   imagePath: string;
   segmentedPath?: string;
   heatmapPath?: string;
+  /** Web path to SAM 3D reconstructed GLB mesh (null when not generated) */
+  glbPath?: string;
   /** normalised bbox of the bone subject in the original image */
   subjectBox?: BoundingBox;
   /** key feature regions highlighted by the VLM, normalised coords */

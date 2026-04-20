@@ -12,8 +12,9 @@ const STEPS = [
     body: "在田野现场或实验室将骨骼正置于干净背景中，单角度拍摄即可上传。",
   },
   {
-    title: "分割与清理",
-    body: "SAM 3.1 自动去除泥土、手指、比例尺等干扰，提取骨骼主体。",
+    title: "分割与重建",
+    body:
+      "SAM 3.1 去除泥土 / 手指 / 比例尺干扰；SAM 3D 用同一张图重建为可旋转的 3D 数字标本。",
   },
   {
     title: "检索与比对",
@@ -113,7 +114,7 @@ export default function HomePage() {
         <section className="mx-auto max-w-[1240px] px-8 py-16">
           <SectionTitle
             numeral="肆 · 数字标本"
-            subtitle="3D Gaussian Splatting · 环拍重建"
+            subtitle="SAM 3D · 单张照片即重建"
           >
             标本馆预览
           </SectionTitle>
@@ -124,17 +125,18 @@ export default function HomePage() {
               </div>
               <div className="lg:col-span-2">
                 <p className="font-sans text-[14px] leading-[1.9] text-ink-soft">
-                  规划中：田野研究员用手机环拍标本 50–150 张，经 COLMAP 估算相机位姿后，用
-                  <span className="mx-1 text-vermilion">splatfacto</span>
-                  训练 3D Gaussian Splatting 模型，生成 <code className="font-mono text-[12px] text-bronze-dark">.splat</code>
-                  文件后注入本页。浏览器端通过
+                  鉴定上传的同一张骨骼照片，后端自动调用 Meta 2026-03 开源的
+                  <span className="mx-1 text-vermilion">SAM 3D Objects</span>
+                  完成单图三维重建，5–30 秒内产出标准
+                  <code className="font-mono text-[12px] text-bronze-dark">.glb</code>
+                  网格。浏览器端通过
                   <span className="mx-1 text-vermilion">@react-three/fiber</span>
-                  与
-                  <span className="mx-1 text-vermilion">@mkkellogg/gaussian-splats-3d</span>
-                  以 60+ FPS 实时交互，鉴定结论可直接贴在 3D 模型对应骨位。
+                  +
+                  <span className="mx-1 text-vermilion">@react-three/drei</span>
+                  的 useGLTF 实时渲染，鉴定结论可直接贴在 3D 网格对应骨位。
                 </p>
                 <div className="mt-6 text-[11px] tracking-[0.22em] text-ink-muted">
-                  当前展示为占位几何体，待 <code className="font-mono">.splat</code> 资源就位。
+                  当前展示为占位几何体；配置 <code className="font-mono">FAL_KEY</code> 或 <code className="font-mono">REPLICATE_API_TOKEN</code> 后即启用真 SAM 3D 重建。
                 </div>
               </div>
             </div>

@@ -8,8 +8,13 @@ import sharp from "sharp";
 import { selectProvider } from "@/lib/ai/provider";
 import { retrieveKnowledge } from "@/lib/ai/rag";
 import { segmentBoneSubject } from "@/lib/ai/sam";
+import { reconstruct3D } from "@/lib/ai/sam3d";
 import { readDemoFile } from "@/lib/demo";
-import { saveAnalysis, saveImageBuffer } from "@/lib/storage";
+import {
+  saveAnalysis,
+  saveImageBuffer,
+  saveModelBuffer,
+} from "@/lib/storage";
 import type { AnalysisResult } from "@/lib/types";
 import { shortId } from "@/lib/utils";
 
@@ -77,12 +82,27 @@ export async function analyzeBoneAction(formData: FormData): Promise<void> {
   );
   const processingMs = Date.now() - started;
 
+  // Optional SAM 3D single-image reconstruction (replaces the old 3DGS path)
+  let glbPath: string | undefined;
+  try {
+    const reconstruction = await reconstruct3D(segment.buffer, "image/jpeg");
+    if (reconstruction) {
+      glbPath = await saveModelBuffer(id, reconstruction.glb);
+    }
+  } catch (err) {
+    console.warn(
+      "[sam3d] reconstruction failed, continuing without GLB:",
+      err instanceof Error ? err.message : err,
+    );
+  }
+
   const full: AnalysisResult = {
     id,
     timestamp: new Date().toISOString(),
     imagePath,
     segmentedPath,
     heatmapPath: partial.heatmapPath,
+    glbPath,
     subjectBox: partial.subjectBox,
     featureRegions: partial.featureRegions,
     verdict: partial.verdict,
@@ -153,12 +173,26 @@ export async function analyzeDemoAction(formData: FormData): Promise<void> {
   );
   const processingMs = Date.now() - started;
 
+  let glbPath: string | undefined;
+  try {
+    const reconstruction = await reconstruct3D(segment.buffer, "image/jpeg");
+    if (reconstruction) {
+      glbPath = await saveModelBuffer(id, reconstruction.glb);
+    }
+  } catch (err) {
+    console.warn(
+      "[sam3d] reconstruction failed, continuing without GLB:",
+      err instanceof Error ? err.message : err,
+    );
+  }
+
   const full: AnalysisResult = {
     id,
     timestamp: new Date().toISOString(),
     imagePath,
     segmentedPath,
     heatmapPath: partial.heatmapPath,
+    glbPath,
     subjectBox: partial.subjectBox,
     featureRegions: partial.featureRegions,
     verdict: partial.verdict,
@@ -196,5 +230,6 @@ export async function deleteAnalysisAction(
       });
     }
   }
+  await fs.rm(path.join(publicRoot, `${id}.glb`), { force: true });
   revalidatePath("/history");
 }

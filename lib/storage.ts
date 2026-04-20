@@ -23,6 +23,17 @@ export async function saveImageBuffer(
   return `/analyses/${filename}`;
 }
 
+export async function saveModelBuffer(
+  id: string,
+  buf: Buffer,
+): Promise<string> {
+  await ensureDirs();
+  const filename = `${id}.glb`;
+  const abs = path.join(PUBLIC_ROOT, filename);
+  await fs.writeFile(abs, buf);
+  return `/analyses/${filename}`;
+}
+
 export async function saveAnalysis(result: AnalysisResult): Promise<void> {
   await ensureDirs();
   const abs = path.join(ROOT, `${result.id}.json`);

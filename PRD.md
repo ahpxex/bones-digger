@@ -278,37 +278,63 @@ Qwen3-Embedding 对用户查询（"这是什么骨？"）+ 图像 caption 做向
 - 知识库覆盖度不足 → 7 物种以外的样本明确标记"超出知识库范围，建议送专家"，不硬猜
 - DashScope API 答辩现场网络不稳定 → 备预录的 demo 视频 + 本地缓存常见样本结果兜底
 
-### 4.2「骨鉴」+「骨影」混合——加入3DGS数字标本展示
+### 4.2「骨鉴」+「骨影」混合——SAM 3D 单图数字标本
 
-在4.1基础上，增加3D Gaussian Splatting模块：
+> **路线替代说明**：2026-03-27 Meta 发布 SAM 3.1 的同一时间点，Meta AI 同步开源了
+> **SAM 3D Objects**（facebook/sam-3d-objects）——**单张 2D 照片直接生成 3D 物体模型**。
+> 这让"手机环拍 50-150 张 + COLMAP 位姿 + splatfacto 训练"的旧 3DGS 管线彻底失去必要性：
+> 田野研究员**随手拍一张骨骼照片**，几秒内就能得到可在浏览器里旋转的 3D 模型，
+> 同时输出 GLB mesh（便于标注） + 可选 Gaussian Splat（用于高保真可视化）。
+> 本项目直接采用 SAM 3D 作为数字标本基石，原 3DGS 方案整段废弃。
 
 #### 新增功能
 
-- 手机环拍50-150张/标本 → COLMAP+3DGS自动重建
-- Web端Three.js+Spark实时3D交互（60+FPS）
-- AI鉴定结论标注在3D模型对应位置
-- 双标本对比模式（左右分屏马头骨vs牛头骨，同步旋转）
-- 数字骨骼参考馆（按物种/骨位浏览）
+- **单图即 3D**：鉴定上传的同一张照片，鉴定完成后自动调 SAM 3D 重建为 GLB
+- Web 端 `@react-three/fiber` + `useGLTF` 实时旋转、缩放、标注
+- AI 鉴定结论（种属 / 骨位 / 置信度 / 关键特征区域）**直接贴在 3D mesh 对应位置**
+- 双标本对比模式（左右分屏马头骨 vs 牛头骨，同步旋转）
+- 数字骨骼参考馆（按物种 / 骨位浏览，每件标本都有 3D 模型）
 
 #### 技术管线
 
 ```
-手机环拍(100-150张/标本)
-    → COLMAP相机位姿估计（一次性，离线在 Colab / 本地跑）
-    → Nerfstudio splatfacto / OpenSplat 训练
-    → 导出 .splat / .ply 文件
-    → 放入 Next.js public/ 或 Vercel Blob
-    → @react-three/fiber + @mkkellogg/gaussian-splats-3d Web 端实时展示
+用户上传一张骨骼照片
+    → Qwen3.5 + RAG 完成鉴定（§4.1 已实现）
+    → 异步调 SAM 3D Objects
+        · 托管版：fal.ai 的 fal-ai/sam-3/3d-objects 端点（5-30s）
+        · 自托管版：facebook/sam-3d-objects HuggingFace 权重 + Replicate
+    → 产物：GLB mesh（2-15MB）+ 可选 Gaussian Splat（5-50MB）
+    → 放入 public/models/{analysis-id}.glb （本地）或 Vercel Blob（云端）
+    → @react-three/fiber + @react-three/drei useGLTF Web 端渲染
+    → 在 mesh 上叠加 VLM 返回的关键特征区域标注
 ```
 
-> 整条管线里只有 COLMAP + 3DGS 训练是一次性 Python/原生工具任务，产物（`.splat` 文件）直接作为静态资源被 Next.js 托管，运行时完全是 React + WebGL。
+> 整条管线完全零 Python 运行时、零本地 GPU、零位姿估计——SAM 3D 单调用输出 GLB，
+> Next.js 运行时只做 HTTP 调度 + 静态资源托管。
 
-#### 硬件需求
+#### 对比旧 3DGS 方案
 
-- 训练：RTX 3060+（8GB VRAM），分钟级
-- Web展示：无需GPU
-- 新增开发时间：约2-3周
+| 维度 | 旧 3DGS 方案（已废弃） | **SAM 3D（当前）** |
+|---|---|---|
+| 输入 | 每件标本环拍 50-150 张 | **单张照片**（鉴定上传同一张） |
+| 位姿估计 | 需要 COLMAP（几分钟/件） | 免（模型直接推理） |
+| 训练 | splatfacto 训练（分钟-小时级） | 免（一次前向推理 5-30 秒） |
+| 硬件 | RTX 3060+ / 8GB VRAM | 托管 API 无需本地 GPU |
+| 产物 | `.splat` / `.ply` | GLB mesh（标准格式）+ 可选 splat |
+| 开发时间 | 2-3 周 | **0.5 天**（接 API + 挂 useGLTF） |
+| 田野可用性 | 要求专门环拍流程 | **随手一拍即可** |
 
 #### 额外答辩卖点
 
-> 现场演示实时3D旋转，视觉冲击力满分。评委可以直接在浏览器里转动骨骼模型，点击标注点查看AI分析依据。
+> 1. **"全球首个将 SAM 3D 用于动物考古数字化的工具"**（2026-03 SAM 3D 刚开源，生态里还没有此类应用）
+> 2. 现场可直接演示：评委指定任意一张 demo 照片，**5-30 秒内生成可旋转 3D 模型**，视觉冲击力比纯 2D 图更强
+> 3. 田野实用性极强：一部手机 + 一张照片 + 3 秒 → 拿到种属鉴定 + 3D 数字化双结果
+> 4. 未来演进到"整个出土骨骼群的数字标本库"成本极低（无需为每件标本重拍环绕）
+
+#### 相对成本
+
+- fal.ai 托管 SAM 3D 推理：每张约 ¥0.3-1.5（具体看精度档位）
+- Replicate 托管：类似量级
+- 自托管（facebook/sam-3d-objects + 一张 A100/H100）：长期量大时更划算
+
+**新增开发时间：约半天**（仅前端挂 GLB 展示 + 后端多一个 API 调用即可，远低于原 3DGS 方案的 2-3 周）。

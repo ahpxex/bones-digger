@@ -1,7 +1,8 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { OrbitControls, useGLTF, Bounds } from "@react-three/drei";
+import { Suspense, useRef } from "react";
 import type { Mesh } from "three";
 
 function BonePlaceholder() {
@@ -25,7 +26,13 @@ function BonePlaceholder() {
   );
 }
 
-export function SplatPreviewViewer() {
+function GlbModel({ url }: { url: string }) {
+  const gltf = useGLTF(url);
+  return <primitive object={gltf.scene} />;
+}
+
+export function SplatPreviewViewer({ glbUrl }: { glbUrl?: string }) {
+  const hasGlb = typeof glbUrl === "string" && glbUrl.length > 0;
   return (
     <div className="relative h-[420px] w-full overflow-hidden">
       <Canvas
@@ -45,22 +52,36 @@ export function SplatPreviewViewer() {
           intensity={0.5}
           color="#b89766"
         />
-        <BonePlaceholder />
+        {hasGlb ? (
+          <Suspense fallback={<BonePlaceholder />}>
+            <Bounds fit clip observe margin={1.1}>
+              <GlbModel url={glbUrl!} />
+            </Bounds>
+          </Suspense>
+        ) : (
+          <BonePlaceholder />
+        )}
         <mesh
           rotation={[-Math.PI / 2, 0, 0]}
           position={[0, -1.8, 0]}
           receiveShadow
         >
           <circleGeometry args={[4, 48]} />
-          <meshStandardMaterial
-            color="#ebe4d2"
-            roughness={1}
-          />
+          <meshStandardMaterial color="#ebe4d2" roughness={1} />
         </mesh>
+        {hasGlb && <OrbitControls enableDamping makeDefault />}
       </Canvas>
       <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between font-sans text-[11px] tracking-[0.22em] text-ink-muted">
-        <span>3D Gaussian Splatting · placeholder</span>
-        <span>future: 手机环拍 50-150 张 → splatfacto → .splat</span>
+        <span>
+          {hasGlb
+            ? "SAM 3D · single-image reconstruction"
+            : "SAM 3D · placeholder"}
+        </span>
+        <span>
+          {hasGlb
+            ? "drag to rotate · wheel to zoom"
+            : "future: 单张骨骼照片 → SAM 3D → .glb"}
+        </span>
       </div>
     </div>
   );

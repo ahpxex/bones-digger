@@ -58,8 +58,8 @@ export function SiteFooter() {
             技术构成
           </div>
           <ul className="mt-3 space-y-1 leading-relaxed">
-            <li>Qwen3.5-27B · Qwen3.5-397B-A17B</li>
-            <li>SAM 3.1 Object Multiplex</li>
+            <li>Qwen3.5-Flash · Qwen3.5-Plus (Thinking)</li>
+            <li>SAM 3.1 Object Multiplex · SAM 3D Objects</li>
             <li>Qwen3-Embedding · RAG</li>
             <li>Next.js 16 · React 19</li>
           </ul>

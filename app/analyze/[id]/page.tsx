@@ -10,6 +10,7 @@ import { EvidenceChain } from "@/components/result/evidence-chain";
 import { ImageTriptych } from "@/components/result/image-triptych";
 import { KnowledgeCardGrid } from "@/components/result/knowledge-card-grid";
 import { ReasoningPanel } from "@/components/result/reasoning-panel";
+import { SplatPreviewViewer } from "@/components/splat/viewer-preview";
 import { readAnalysis } from "@/lib/storage";
 import { deleteAnalysisAction } from "@/app/actions/analyze";
 import { formatTimestamp } from "@/lib/utils";
@@ -212,6 +213,23 @@ export default async function AnalyzePage({
               <KnowledgeCardGrid cards={result.knowledgeCards} />
             </div>
           </section>
+
+          {result.glbPath && (
+            <>
+              <Divider label="SAM 3D 数字标本" />
+              <section>
+                <SectionTitle
+                  numeral="柒 · 数字标本"
+                  subtitle="SAM 3D · single-image reconstruction"
+                >
+                  三维重建
+                </SectionTitle>
+                <Frame tone="paper" className="mt-8 p-6">
+                  <SplatPreviewViewer glbUrl={result.glbPath} />
+                </Frame>
+              </section>
+            </>
+          )}
 
           <Divider />
 
