@@ -127,12 +127,37 @@ function buildSystemPrompt(
     "",
     "【输出格式——极其严格】",
     "- 只输出一个纯 JSON 对象，不要用 markdown ``` 代码围栏包裹，不要前后加任何解释文字。",
-    "- 顶层字段必须是：verdict / ranking / dimensions / evidence / reasoning，可选 outOfDistribution / subjectBox。",
-    "- 所有键名与枚举值都使用中文，例如：",
-    '    "dimensions": { "整体形态": 0.8, "关键结构": 0.9, "截面断面": 0.7, "表面纹理": 0.6, "表面痕迹": 0.5, "尺寸比例": 0.8 }',
-    '    "verdict": { "species": "马", "position": "距骨", "confidence": 0.85 }',
-    "- evidence 必须是对象数组；若图像信息不足可以返回空数组 []。",
-    "- subjectBox 必须是形如 {\"x\":0.2,\"y\":0.1,\"w\":0.6,\"h\":0.7} 的对象；不可用时可省略。",
+    "- 输出必须能被 JSON.parse 解析，键名严格按照下面的示例，不得使用同义词。",
+    "",
+    "完整结构示例（必须完全按此 key 与层次）：",
+    "{",
+    '  "verdict": { "species": "马", "position": "距骨", "confidence": 0.85 },',
+    '  "outOfDistribution": false,',
+    '  "ranking": [',
+    '    { "species": "马", "position": "距骨", "confidence": 0.85 },',
+    '    { "species": "黄牛", "position": "距骨", "confidence": 0.08 },',
+    '    { "species": "鹿", "position": "距骨", "confidence": 0.04 }',
+    '  ],',
+    '  "dimensions": {',
+    '    "整体形态": 0.82, "关键结构": 0.91, "截面断面": 0.76,',
+    '    "表面纹理": 0.68, "表面痕迹": 0.55, "尺寸比例": 0.80',
+    '  },',
+    '  "evidence": [',
+    '    {',
+    '      "key": "滑车结构",',
+    '      "observation": "近端可见明显单滑车，内侧有一处突起",',
+    '      "referenceFeature": "马距骨：单滑车结构；内侧有明显突起",',
+    '      "weight": 0.35,',
+    '      "region": { "x": 0.3, "y": 0.12, "w": 0.18, "h": 0.18 }',
+    '    }',
+    '  ],',
+    '  "subjectBox": { "x": 0.18, "y": 0.1, "w": 0.64, "h": 0.75 },',
+    '  "reasoning": "【分割】… 【形态观察】… 【判定】…"',
+    "}",
+    "",
+    "- evidence 数组每一项都必须包含 key / observation / referenceFeature / weight 四个字符串或数字字段，可选 region 对象。",
+    "- evidence 不足时可为空数组 []，但绝不能省略字段名。",
+    "- subjectBox / region 必须是 {x,y,w,h} 对象，绝不能是数组。",
     "",
     "【鉴定规则】",
     "- 证据只能从下列专家特征表里引用，不得编造新特征。",
@@ -257,16 +282,54 @@ async function callChannel(
   const canon = (v: unknown): unknown =>
     typeof v === "string" && UNKNOWN_ALIASES.has(v) ? "未知" : v;
 
+  const normaliseRegion = (val: unknown): unknown => {
+    if (!val) return undefined;
+    if (Array.isArray(val) && val.length >= 4) {
+      return {
+        x: Number(val[0]),
+        y: Number(val[1]),
+        w: Number(val[2]),
+        h: Number(val[3]),
+      };
+    }
+    if (typeof val === "object") return val;
+    return undefined;
+  };
+
+  const pickString = (
+    obj: Record<string, unknown>,
+    keys: string[],
+  ): string | undefined => {
+    for (const k of keys) {
+      const v = obj[k];
+      if (typeof v === "string" && v.length > 0) return v;
+    }
+    return undefined;
+  };
+
+  const pickNumber = (
+    obj: Record<string, unknown>,
+    keys: string[],
+  ): number | undefined => {
+    for (const k of keys) {
+      const v = obj[k];
+      if (typeof v === "number" && !Number.isNaN(v)) return v;
+      if (typeof v === "string") {
+        const n = Number(v);
+        if (!Number.isNaN(n)) return n;
+      }
+    }
+    return undefined;
+  };
+
   if (parsed && typeof parsed === "object") {
     const obj = parsed as Record<string, unknown>;
-    // Qwen sometimes returns ranking / evidence as {} instead of [] when empty
     if (obj.ranking && !Array.isArray(obj.ranking) && typeof obj.ranking === "object") {
       obj.ranking = [];
     }
     if (obj.evidence && !Array.isArray(obj.evidence) && typeof obj.evidence === "object") {
       obj.evidence = [];
     }
-    // Canonicalise species/position synonyms
     if (obj.verdict && typeof obj.verdict === "object") {
       const v = obj.verdict as Record<string, unknown>;
       v.species = canon(v.species);
@@ -281,12 +344,73 @@ async function callChannel(
         }
       }
     }
+    // Normalise evidence entries: map synonym keys + array-form region
+    if (Array.isArray(obj.evidence)) {
+      obj.evidence = (obj.evidence as unknown[])
+        .map((e) => {
+          if (!e || typeof e !== "object") return null;
+          const row = e as Record<string, unknown>;
+          const key = pickString(row, [
+            "key",
+            "feature",
+            "name",
+            "title",
+            "要点",
+            "特征",
+            "特征点",
+          ]);
+          const observation = pickString(row, [
+            "observation",
+            "description",
+            "detail",
+            "text",
+            "image_observation",
+            "图像观察",
+            "观察",
+          ]);
+          const referenceFeature = pickString(row, [
+            "referenceFeature",
+            "reference",
+            "source",
+            "basis",
+            "expert_feature",
+            "专家特征",
+            "参考",
+            "参考特征",
+          ]);
+          const weight = pickNumber(row, [
+            "weight",
+            "score",
+            "importance",
+            "权重",
+          ]);
+          const region = normaliseRegion(
+            row.region ?? row.bbox ?? row.box ?? row.区域,
+          );
+          if (!key || !observation || !referenceFeature || weight === undefined) {
+            return null;
+          }
+          const out: Record<string, unknown> = {
+            key,
+            observation,
+            referenceFeature,
+            weight,
+          };
+          if (region) out.region = region;
+          return out;
+        })
+        .filter((x): x is Record<string, unknown> => x !== null);
+    }
+    // Normalise subjectBox if provided as array
+    const sb = normaliseRegion(obj.subjectBox);
+    if (sb) obj.subjectBox = sb;
+    else delete obj.subjectBox;
   }
 
   const result = analysisSchema.safeParse(parsed);
   if (!result.success) {
     throw new Error(
-      `Qwen JSON did not match schema (model=${modelId}):\n${JSON.stringify(result.error.issues, null, 2)}\n---raw---\n${text.slice(0, 600)}`,
+      `Qwen JSON did not match schema (model=${modelId}):\n${JSON.stringify(result.error.issues, null, 2)}\n---parsed---\n${JSON.stringify(parsed, null, 2)}\n---raw text---\n${text}`,
     );
   }
   return result.data;
