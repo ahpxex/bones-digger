@@ -57,7 +57,7 @@ export default function HomePage() {
               <div className="mt-8 flex items-center gap-6">
                 <div className="flex items-center gap-3 text-[12px] tracking-[0.22em] text-ink-muted">
                   <span className="h-px w-8 bg-bronze" />
-                  覆盖七大物种
+                  限定马牛二分类
                 </div>
                 <div className="flex items-center gap-3 text-[12px] tracking-[0.22em] text-ink-muted">
                   <span className="h-px w-8 bg-bronze" />

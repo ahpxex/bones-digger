@@ -1,4 +1,9 @@
-import type { BonePosition, KnowledgeCard, Species } from "@/lib/types";
+import type {
+  AnalysisSpecies,
+  BonePosition,
+  KnowledgeCard,
+  Species,
+} from "@/lib/types";
 
 const SPECIES_LATIN: Record<Species, string> = {
   马: "Equus caballus",
@@ -745,6 +750,19 @@ export const KNOWLEDGE_CARDS: KnowledgeCard[] = RAW.map((row) => ({
   features: row.features,
   summary: makeSummary(row),
 }));
+
+export const ANALYSIS_SPECIES_LIST = ["马", "黄牛"] as const satisfies readonly [
+  AnalysisSpecies,
+  AnalysisSpecies,
+];
+
+export function isAnalysisSpecies(species: Species): species is AnalysisSpecies {
+  return (ANALYSIS_SPECIES_LIST as readonly Species[]).includes(species);
+}
+
+export const ANALYSIS_KNOWLEDGE_CARDS = KNOWLEDGE_CARDS.filter((card) =>
+  isAnalysisSpecies(card.species),
+);
 
 export const SPECIES_LIST: Species[] = [
   "马",

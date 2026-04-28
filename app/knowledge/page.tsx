@@ -2,9 +2,9 @@ import { SiteFooter, SiteHeader } from "@/components/ui/site-chrome";
 import { Divider } from "@/components/ui/frame";
 import { SectionTitle } from "@/components/ui/section-title";
 import {
-  KNOWLEDGE_CARDS,
+  ANALYSIS_KNOWLEDGE_CARDS,
+  ANALYSIS_SPECIES_LIST,
   POSITION_LIST,
-  SPECIES_LIST,
   speciesLatin,
 } from "@/lib/knowledge/bones";
 import {
@@ -37,11 +37,11 @@ export default function KnowledgePage() {
           <div className="mt-6 flex flex-wrap gap-6 text-[12px] tracking-[0.22em] text-ink-muted">
             <div>
               <span className="text-bronze">物种</span>
-              {SPECIES_LIST.join(" · ")}
+              {ANALYSIS_SPECIES_LIST.join(" · ")}
             </div>
             <div>
               <span className="text-bronze">形态条目</span>
-              {KNOWLEDGE_CARDS.length}
+              {ANALYSIS_KNOWLEDGE_CARDS.length}
             </div>
             <div>
               <span className="text-bronze">品种档案</span>
@@ -62,7 +62,7 @@ export default function KnowledgePage() {
                     {position}
                   </SectionTitle>
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {SPECIES_LIST.map((species) => {
+                    {ANALYSIS_SPECIES_LIST.map((species) => {
                       const features = row[species];
                       if (!features) return null;
                       return (
@@ -197,7 +197,7 @@ export default function KnowledgePage() {
 
 function buildGrid(): Record<BonePosition, Partial<Record<Species, string[]>>> {
   const grid = {} as Record<BonePosition, Partial<Record<Species, string[]>>>;
-  for (const card of KNOWLEDGE_CARDS) {
+  for (const card of ANALYSIS_KNOWLEDGE_CARDS) {
     if (!grid[card.position]) grid[card.position] = {};
     grid[card.position]![card.species] = card.features;
   }

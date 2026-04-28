@@ -85,16 +85,6 @@ export default async function AnalyzePage({
                   )}
                 </div>
               </div>
-              {result.outOfDistribution && (
-                <div className="border-l-2 border-vermilion bg-paper-warm px-4 py-3">
-                  <div className="font-serif text-[13px] tracking-[0.22em] text-vermilion-deep">
-                    超出知识库范围
-                  </div>
-                  <p className="mt-1 font-sans text-[12px] leading-[1.8] text-ink-soft">
-                    本样本可能不属于当前 7 物种（马 / 黄牛 / 水牛 / 鹿 / 羊 / 猪 / 狗）任一类。建议送专家核验后再录入。
-                  </p>
-                </div>
-              )}
               <Frame tone="paper" className="p-6">
                 <div className="font-serif text-[13px] tracking-[0.28em] text-vermilion">
                   鉴定元数据

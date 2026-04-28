@@ -2,30 +2,23 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import { z } from "zod";
 import {
+  ANALYSIS_SPECIES_LIST,
   cardFor,
+  isAnalysisSpecies,
   positionLatin,
   speciesLatin,
 } from "@/lib/knowledge/bones";
 import type {
   AnalysisDimension,
   AnalysisResult,
+  AnalysisSpecies,
   BonePosition,
   KnowledgeCard,
-  Species,
   Verdict,
 } from "@/lib/types";
 import type { AnalyzeInput, Provider } from "./provider";
 
-const SPECIES_ENUM = [
-  "马",
-  "黄牛",
-  "水牛",
-  "鹿",
-  "羊",
-  "猪",
-  "狗",
-  "未知",
-] as const;
+const SPECIES_ENUM = ANALYSIS_SPECIES_LIST;
 const POSITION_ENUM = [
   "掌骨",
   "跖骨",
@@ -46,7 +39,6 @@ const POSITION_ENUM = [
   "肩胛骨",
   "肱骨",
   "其他",
-  "未知",
 ] as const;
 
 const bboxSchema = z.object({
@@ -72,7 +64,7 @@ const analysisSchema = z.object({
       }),
     )
     .min(0)
-    .max(8)
+    .max(2)
     .optional()
     .default([]),
   dimensions: z.object({
@@ -135,8 +127,7 @@ function buildSystemPrompt(
     '  "outOfDistribution": false,',
     '  "ranking": [',
     '    { "species": "马", "position": "距骨", "confidence": 0.85 },',
-    '    { "species": "黄牛", "position": "距骨", "confidence": 0.08 },',
-    '    { "species": "鹿", "position": "距骨", "confidence": 0.04 }',
+    '    { "species": "黄牛", "position": "距骨", "confidence": 0.15 }',
     '  ],',
     '  "dimensions": {',
     '    "整体形态": 0.82, "关键结构": 0.91, "截面断面": 0.76,',
@@ -161,10 +152,10 @@ function buildSystemPrompt(
     "",
     "【鉴定规则】",
     "- 证据只能从下列专家特征表里引用，不得编造新特征。",
-    "- 即使图像不完美，也要尽可能给出至少 3 个候选 (ranking)，按置信度降序。只有当图像完全无法辨识时才使用 \"未知\"。",
-    "- 若图像模糊 / 残缺过度 / 对象不属于 7 物种（马/黄牛/水牛/鹿/羊/猪/狗）任何一种，",
-    "  才把 verdict.species 置为 \"未知\"，outOfDistribution: true，confidence ≤ 0.3。此时 evidence 可为 []，但 ranking 仍应给出最可能的候选。",
-    "- 对田野出土照片的常见情况（背景杂乱、局部断口、附着泥土）不要轻易判 \"未知\"——这些图片就是期望的输入分布。",
+    "- 这是封闭二分类任务：verdict.species 只能是 \"马\" 或 \"黄牛\"，不能输出狗、鹿、羊、猪、水牛、其他动物或 \"未知\"。",
+    "- ranking 必须只包含马和黄牛两个候选，按置信度降序；即使图像不完美，也必须在这两个物种中选择更可能的一类。",
+    "- 若只能判断为泛称 \"牛\"，统一输出 \"黄牛\"；骨位无法细分时 position 使用 \"其他\"，不要输出 \"未知\"。",
+    "- outOfDistribution 固定为 false。",
     "- subjectBox / evidence[].region 为归一化坐标 [0,1]，(x,y) 为左上角，(w,h) 为宽高。",
     "- dimensions 六维打分：整体形态 / 关键结构 / 截面断面 / 表面纹理 / 表面痕迹 / 尺寸比例，每项 [0,1] 浮点，六个键都必须存在。",
     "- ranking 是对象数组，每项都应是 {\"species\": \"马\", \"position\": \"距骨\", \"confidence\": 0.62}。绝不能是空对象 {}。",
@@ -265,11 +256,12 @@ async function callChannel(
     );
   }
 
-  // Normalise common Qwen oddities before Zod parsing
+  // Normalise common Qwen oddities before Zod parsing.
   const UNKNOWN_ALIASES = new Set([
     "未定",
     "待定",
     "不确定",
+    "未知",
     "未判定",
     "无法判定",
     "无法识别",
@@ -279,8 +271,109 @@ async function callChannel(
     "Unknown",
     "",
   ]);
-  const canon = (v: unknown): unknown =>
-    typeof v === "string" && UNKNOWN_ALIASES.has(v) ? "未知" : v;
+  const defaultSpecies: AnalysisSpecies =
+    (retrieved.find((card) => isAnalysisSpecies(card.species))?.species as
+      | AnalysisSpecies
+      | undefined) ?? "黄牛";
+
+  const speciesFromKnownLabel = (value: unknown): AnalysisSpecies | undefined => {
+    if (typeof value !== "string") return undefined;
+    const raw = value.trim();
+    const text = raw.toLowerCase();
+    if (raw === "马" || text.includes("equus")) return "马";
+    if (
+      raw === "黄牛" ||
+      raw === "牛" ||
+      raw === "家牛" ||
+      raw === "水牛" ||
+      text.includes("bos") ||
+      text.includes("bubalus") ||
+      raw.includes("牛")
+    ) {
+      return "黄牛";
+    }
+    return undefined;
+  };
+
+  const clampConfidence = (value: unknown, fallback: number): number => {
+    const n =
+      typeof value === "number"
+        ? value
+        : typeof value === "string"
+          ? Number(value)
+          : Number.NaN;
+    if (!Number.isFinite(n)) return fallback;
+    return Math.min(1, Math.max(0.01, n));
+  };
+
+  const coercePosition = (
+    value: unknown,
+    fallback: BonePosition = "其他",
+  ): BonePosition => {
+    if (typeof value !== "string") return fallback;
+    const raw = value.trim();
+    if ((POSITION_ENUM as readonly string[]).includes(raw)) {
+      return raw as BonePosition;
+    }
+    if (UNKNOWN_ALIASES.has(raw)) return "其他";
+    return fallback;
+  };
+
+  const buildClosedRanking = (
+    rawRanking: unknown[],
+    verdictSpecies: AnalysisSpecies,
+    verdictPosition: BonePosition,
+    verdictConfidence: number,
+  ) => {
+    const rows = new Map<
+      AnalysisSpecies,
+      { species: AnalysisSpecies; position: BonePosition; confidence: number }
+    >();
+
+    for (const item of rawRanking) {
+      if (!item || typeof item !== "object") continue;
+      const row = item as Record<string, unknown>;
+      const species = speciesFromKnownLabel(row.species);
+      if (!species) continue;
+      const confidence = clampConfidence(
+        row.confidence,
+        species === verdictSpecies ? verdictConfidence : 1 - verdictConfidence,
+      );
+      const current = rows.get(species);
+      if (!current || confidence > current.confidence) {
+        rows.set(species, {
+          species,
+          position: coercePosition(row.position, verdictPosition),
+          confidence,
+        });
+      }
+    }
+
+    const otherSpecies: AnalysisSpecies =
+      verdictSpecies === "马" ? "黄牛" : "马";
+    const verdictRow = rows.get(verdictSpecies);
+    if (!verdictRow || verdictRow.confidence < verdictConfidence) {
+      rows.set(verdictSpecies, {
+        species: verdictSpecies,
+        position: verdictPosition,
+        confidence: verdictConfidence,
+      });
+    }
+    if (!rows.has(otherSpecies)) {
+      rows.set(otherSpecies, {
+        species: otherSpecies,
+        position: verdictPosition,
+        confidence: Math.max(0.01, Math.min(0.49, 1 - verdictConfidence)),
+      });
+    }
+
+    const top = rows.get(verdictSpecies)!;
+    const other = rows.get(otherSpecies)!;
+    if (other.confidence >= top.confidence) {
+      other.confidence = Math.max(0.01, top.confidence * 0.65);
+    }
+    return [top, other].sort((a, b) => b.confidence - a.confidence);
+  };
 
   const normaliseRegion = (val: unknown): unknown => {
     if (!val) return undefined;
@@ -332,18 +425,30 @@ async function callChannel(
     }
     if (obj.verdict && typeof obj.verdict === "object") {
       const v = obj.verdict as Record<string, unknown>;
-      v.species = canon(v.species);
-      v.position = canon(v.position);
+      const rawRanking = Array.isArray(obj.ranking) ? obj.ranking : [];
+      const rankingSpecies = rawRanking
+        .map((r) =>
+          r && typeof r === "object"
+            ? speciesFromKnownLabel((r as Record<string, unknown>).species)
+            : undefined,
+        )
+        .find((s): s is AnalysisSpecies => Boolean(s));
+      const verdictSpecies =
+        speciesFromKnownLabel(v.species) ?? rankingSpecies ?? defaultSpecies;
+      const verdictPosition = coercePosition(v.position);
+      const verdictConfidence = clampConfidence(v.confidence, 0.5);
+
+      v.species = verdictSpecies;
+      v.position = verdictPosition;
+      v.confidence = verdictConfidence;
+      obj.ranking = buildClosedRanking(
+        rawRanking,
+        verdictSpecies,
+        verdictPosition,
+        verdictConfidence,
+      );
     }
-    if (Array.isArray(obj.ranking)) {
-      for (const r of obj.ranking) {
-        if (r && typeof r === "object") {
-          const row = r as Record<string, unknown>;
-          row.species = canon(row.species);
-          row.position = canon(row.position);
-        }
-      }
-    }
+    obj.outOfDistribution = false;
     // Normalise evidence entries: map synonym keys + array-form region
     if (Array.isArray(obj.evidence)) {
       obj.evidence = (obj.evidence as unknown[])
@@ -421,13 +526,13 @@ function verdictFromResp(resp: AnalysisResponse): Verdict {
     .slice()
     .sort((a, b) => b.confidence - a.confidence);
   return {
-    species: resp.verdict.species as Species,
-    speciesLatin: speciesLatin(resp.verdict.species as Species),
+    species: resp.verdict.species as AnalysisSpecies,
+    speciesLatin: speciesLatin(resp.verdict.species as AnalysisSpecies),
     position: resp.verdict.position as BonePosition,
     positionLatin: positionLatin(resp.verdict.position as BonePosition),
     confidence: resp.verdict.confidence,
     ranking: ranking.map((r) => ({
-      species: r.species as Species,
+      species: r.species as AnalysisSpecies,
       position: r.position as BonePosition,
       confidence: r.confidence,
     })),
@@ -453,10 +558,8 @@ export const dashScopeProvider: Provider = {
     );
     const realtimeVerdict = verdictFromResp(realtimeResp);
 
-    // Step 2 — thinking channel runs for low-confidence OR out-of-distribution samples
-    const shouldThink =
-      realtimeVerdict.confidence < LOW_CONFIDENCE_THRESHOLD ||
-      realtimeResp.outOfDistribution;
+    // Step 2 — thinking channel runs for low-confidence samples.
+    const shouldThink = realtimeVerdict.confidence < LOW_CONFIDENCE_THRESHOLD;
 
     let thinkingResp: AnalysisResponse | null = null;
     let thinkingVerdict: Verdict | undefined;
@@ -537,8 +640,7 @@ export const dashScopeProvider: Provider = {
       evidence,
       reasoning: finalResp.reasoning,
       thinkingReasoning: thinkingResp?.reasoning,
-      outOfDistribution:
-        finalResp.outOfDistribution || finalVerdict.species === "未知",
+      outOfDistribution: false,
       channelVerdicts: {
         realtime: realtimeVerdict,
         thinking: thinkingVerdict,

@@ -1,4 +1,5 @@
 import {
+  ANALYSIS_SPECIES_LIST,
   KNOWLEDGE_CARDS,
   cardFor,
   speciesLatin,
@@ -7,10 +8,10 @@ import {
 import type {
   AnalysisDimension,
   AnalysisResult,
+  AnalysisSpecies,
   EvidenceItem,
   FeatureRegion,
   RankingEntry,
-  Species,
   Verdict,
 } from "@/lib/types";
 import type { AnalyzeInput, Provider } from "./provider";
@@ -35,7 +36,7 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-const SPECIES_PICKS: Species[] = ["马", "黄牛", "鹿", "羊", "猪", "狗"];
+const SPECIES_PICKS: AnalysisSpecies[] = [...ANALYSIS_SPECIES_LIST];
 
 export const mockProvider: Provider = {
   name: "mock",
@@ -54,7 +55,7 @@ export const mockProvider: Provider = {
     const position = pickedCard.position;
     const topConfidence = 0.72 + rand() * 0.22;
     const remaining = 1 - topConfidence;
-    const competitors: Species[] = SPECIES_PICKS.filter((s) => s !== top);
+    const competitors: AnalysisSpecies[] = SPECIES_PICKS.filter((s) => s !== top);
     const splits = [0.55, 0.25, 0.12, 0.05, 0.03];
     const ranking: RankingEntry[] = [
       { species: top, position, confidence: topConfidence },

@@ -1,5 +1,5 @@
 import type { KnowledgeCard } from "@/lib/types";
-import { KNOWLEDGE_CARDS } from "@/lib/knowledge/bones";
+import { ANALYSIS_KNOWLEDGE_CARDS } from "@/lib/knowledge/bones";
 
 const EMBED_MODEL =
   process.env.DASHSCOPE_EMBEDDING_MODEL ?? "text-embedding-v4";
@@ -71,7 +71,7 @@ async function buildKnowledgeIndex(): Promise<CachedCard[]> {
   if (kbBuildPromise) return kbBuildPromise;
 
   kbBuildPromise = (async () => {
-    const texts = KNOWLEDGE_CARDS.map(cardToText);
+    const texts = ANALYSIS_KNOWLEDGE_CARDS.map(cardToText);
     // DashScope text-embedding-v4 caps batch at 10 per call
     const batchSize = 10;
     const vectors: Float32Array[] = new Array(texts.length);
@@ -82,7 +82,7 @@ async function buildKnowledgeIndex(): Promise<CachedCard[]> {
         vectors[i + j] = part[j]!;
       }
     }
-    const built: CachedCard[] = KNOWLEDGE_CARDS.map((card, i) => ({
+    const built: CachedCard[] = ANALYSIS_KNOWLEDGE_CARDS.map((card, i) => ({
       id: card.id,
       vector: vectors[i]!,
     }));
@@ -113,7 +113,7 @@ export async function retrieveByEmbedding(
       }))
       .sort((a, b) => b.score - a.score)
       .slice(0, topK);
-    const byId = new Map(KNOWLEDGE_CARDS.map((c) => [c.id, c]));
+    const byId = new Map(ANALYSIS_KNOWLEDGE_CARDS.map((c) => [c.id, c]));
     return scored
       .map((s) => byId.get(s.entry.id))
       .filter((c): c is KnowledgeCard => Boolean(c));

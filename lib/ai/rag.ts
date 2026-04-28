@@ -1,4 +1,4 @@
-import { KNOWLEDGE_CARDS } from "@/lib/knowledge/bones";
+import { ANALYSIS_KNOWLEDGE_CARDS } from "@/lib/knowledge/bones";
 import type { KnowledgeCard } from "@/lib/types";
 import { retrieveByEmbedding } from "./embedding";
 
@@ -33,7 +33,7 @@ function score(query: string, card: KnowledgeCard): number {
 }
 
 export function retrieveByBigram(query: string, topK = 8): KnowledgeCard[] {
-  const scored = KNOWLEDGE_CARDS.map((card) => ({
+  const scored = ANALYSIS_KNOWLEDGE_CARDS.map((card) => ({
     card,
     s: score(query, card),
   }))
@@ -41,7 +41,7 @@ export function retrieveByBigram(query: string, topK = 8): KnowledgeCard[] {
     .sort((a, b) => b.s - a.s);
 
   if (scored.length === 0) {
-    return KNOWLEDGE_CARDS.slice(0, topK);
+    return ANALYSIS_KNOWLEDGE_CARDS.slice(0, topK);
   }
   return scored.slice(0, topK).map((x) => x.card);
 }

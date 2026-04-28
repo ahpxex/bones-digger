@@ -1,6 +1,7 @@
+export type AnalysisSpecies = "马" | "黄牛";
+
 export type Species =
-  | "马"
-  | "黄牛"
+  | AnalysisSpecies
   | "水牛"
   | "鹿"
   | "羊"
@@ -39,7 +40,7 @@ export type AnalysisDimension =
   | "尺寸比例";
 
 export interface RankingEntry {
-  species: Species;
+  species: AnalysisSpecies;
   position: BonePosition;
   confidence: number;
 }
@@ -49,7 +50,7 @@ export interface EvidenceItem {
   key: string;
   observation: string;
   referenceFeature: string;
-  sourceSpecies: Species;
+  sourceSpecies: AnalysisSpecies;
   sourcePosition: BonePosition;
   weight: number;
   /** Optional region on the original image that supports this evidence */
@@ -70,7 +71,7 @@ export interface KnowledgeCard {
 }
 
 export interface Verdict {
-  species: Species;
+  species: AnalysisSpecies;
   speciesLatin?: string;
   position: BonePosition;
   positionLatin?: string;
@@ -128,7 +129,7 @@ export interface AnalysisSummary {
   id: string;
   timestamp: string;
   imagePath: string;
-  species: Species;
+  species: AnalysisSpecies;
   position: BonePosition;
   confidence: number;
 }
