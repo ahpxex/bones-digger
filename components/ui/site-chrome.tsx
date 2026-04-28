@@ -64,21 +64,10 @@ export function SiteFooter() {
             <li>Next.js 16 · React 19</li>
           </ul>
         </div>
-        <div>
-          <div className="font-serif text-sm tracking-[0.2em] text-ink-soft">
-            协作单位
-          </div>
-          <ul className="mt-3 space-y-1 leading-relaxed">
-            <li>中国社会科学院考古研究所</li>
-            <li>动物考古学实验室</li>
-            <li>人工智能赛道参赛作品</li>
-          </ul>
-        </div>
       </div>
       <div className="border-t border-bronze/30 bg-paper-deep/40">
         <div className="mx-auto max-w-[1240px] px-8 py-4 text-[11px] tracking-[0.24em] text-ink-muted flex justify-between">
           <span>骨鉴 · OSTEOGNOSIS</span>
-          <span>丙午年·参赛版本</span>
         </div>
       </div>
     </footer>
