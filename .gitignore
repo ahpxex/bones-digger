@@ -40,7 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local-only specimen data (never committed)
+# local-only generated analysis data (never committed)
 /data/analyses/
 /public/analyses/
-/public/demo/
