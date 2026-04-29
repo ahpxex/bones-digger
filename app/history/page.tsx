@@ -6,6 +6,8 @@ import { listAnalyses } from "@/lib/storage";
 import { deleteAnalysisAction } from "@/app/actions/analyze";
 import { formatTimestamp } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function HistoryPage() {
   const analyses = await listAnalyses();
   return (

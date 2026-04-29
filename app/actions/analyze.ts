@@ -1,7 +1,5 @@
 "use server";
 
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
@@ -11,6 +9,7 @@ import { segmentBoneSubject } from "@/lib/ai/sam";
 import { reconstruct3D } from "@/lib/ai/sam3d";
 import { readDemoFile } from "@/lib/demo";
 import {
+  deleteAnalysis,
   saveAnalysis,
   saveImageBuffer,
   saveModelBuffer,
@@ -18,7 +17,7 @@ import {
 import type { AnalysisResult } from "@/lib/types";
 import { shortId } from "@/lib/utils";
 
-const MAX_BYTES = 16 * 1024 * 1024;
+const MAX_BYTES = 4 * 1024 * 1024;
 const ACCEPTED = new Set([
   "image/jpeg",
   "image/jpg",
@@ -37,7 +36,7 @@ export async function analyzeBoneAction(formData: FormData): Promise<void> {
     throw new Error(`不支持的图片格式：${file.type}。请上传 JPEG / PNG / WebP。`);
   }
   if (file.size > MAX_BYTES) {
-    throw new Error("图片超过 8MB。请压缩后重试。");
+    throw new Error("图片超过云端处理上限。请压缩后重试。");
   }
 
   const rawBuffer = Buffer.from(await file.arrayBuffer());
@@ -220,16 +219,6 @@ export async function deleteAnalysisAction(
   if (typeof id !== "string" || !/^[a-z0-9]+$/.test(id)) {
     throw new Error("Invalid analysis id");
   }
-  const root = path.join(process.cwd(), "data", "analyses");
-  const publicRoot = path.join(process.cwd(), "public", "analyses");
-  await fs.rm(path.join(root, `${id}.json`), { force: true });
-  for (const suffix of ["original", "segmented", "heatmap"]) {
-    for (const ext of ["jpg", "png", "webp"]) {
-      await fs.rm(path.join(publicRoot, `${id}-${suffix}.${ext}`), {
-        force: true,
-      });
-    }
-  }
-  await fs.rm(path.join(publicRoot, `${id}.glb`), { force: true });
+  await deleteAnalysis(id);
   revalidatePath("/history");
 }

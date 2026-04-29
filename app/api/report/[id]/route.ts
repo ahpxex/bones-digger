@@ -3,6 +3,8 @@ import type { NextRequest } from "next/server";
 import { readAnalysis } from "@/lib/storage";
 import { formatTimestamp } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
   _req: NextRequest,
   ctx: { params: Promise<{ id: string }> },
@@ -15,8 +17,10 @@ export async function GET(
 
   const host = _req.headers.get("host") ?? "localhost:3000";
   const proto = _req.headers.get("x-forwarded-proto") ?? "http";
-  const imgUrl = `${proto}://${host}${result.imagePath}`;
-  const segUrl = `${proto}://${host}${result.segmentedPath ?? result.imagePath}`;
+  const toAbsoluteUrl = (url: string) =>
+    /^https?:\/\//i.test(url) ? url : `${proto}://${host}${url}`;
+  const imgUrl = toAbsoluteUrl(result.imagePath);
+  const segUrl = toAbsoluteUrl(result.segmentedPath ?? result.imagePath);
 
   const evidenceRows = result.evidence
     .map(

@@ -15,6 +15,8 @@ import { readAnalysis } from "@/lib/storage";
 import { deleteAnalysisAction } from "@/app/actions/analyze";
 import { formatTimestamp } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+
 export default async function AnalyzePage({
   params,
 }: {
