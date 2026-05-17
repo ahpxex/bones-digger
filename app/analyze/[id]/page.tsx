@@ -206,22 +206,36 @@ export default async function AnalyzePage({
             </div>
           </section>
 
-          {result.glbPath && (
-            <>
-              <Divider label="SAM 3D 数字标本" />
-              <section>
-                <SectionTitle
-                  numeral="柒 · 数字标本"
-                  subtitle="SAM 3D · single-image reconstruction"
-                >
-                  三维重建
-                </SectionTitle>
-                <Frame tone="paper" className="mt-8 p-6">
-                  <SplatPreviewViewer glbUrl={result.glbPath} />
-                </Frame>
-              </section>
-            </>
-          )}
+          <Divider label="SAM 3D 数字标本" />
+          <section>
+            <SectionTitle
+              numeral="柒 · 数字标本"
+              subtitle={
+                result.glbPath
+                  ? "SAM 3D · single-image reconstruction"
+                  : "SAM 3D 管线 · 离线数字标本"
+              }
+            >
+              三维重建
+            </SectionTitle>
+            <Frame tone="paper" className="mt-8 p-6">
+              <SplatPreviewViewer
+                glbUrl={result.glbPath}
+                species={result.verdict.species}
+                position={result.verdict.position}
+              />
+              {!result.glbPath && (
+                <div className="mt-4 font-sans text-[11px] tracking-[0.22em] text-ink-muted">
+                  本标本根据鉴定结论（
+                  <span className="text-vermilion">
+                    {result.verdict.species}·{result.verdict.position}
+                  </span>
+                  ）从数字标本馆实时生成；接入 SAM 3D 在线重建请配置{" "}
+                  <code className="font-mono text-bronze-dark">SAM3D_PROVIDER</code>。
+                </div>
+              )}
+            </Frame>
+          </section>
 
           <Divider />
 

@@ -121,7 +121,7 @@ export default function HomePage() {
           <Frame tone="paper" className="mt-8 p-6">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
               <div className="lg:col-span-3">
-                <SplatPreviewViewer />
+                <SplatPreviewViewer species="马" position="股骨" />
               </div>
               <div className="lg:col-span-2">
                 <p className="font-sans text-[14px] leading-[1.9] text-ink-soft">
@@ -136,7 +136,7 @@ export default function HomePage() {
                   的 useGLTF 实时渲染，鉴定结论可直接贴在 3D 网格对应骨位。
                 </p>
                 <div className="mt-6 text-[11px] tracking-[0.22em] text-ink-muted">
-                  当前展示为占位几何体；配置 <code className="font-mono">FAL_KEY</code> 或 <code className="font-mono">REPLICATE_API_TOKEN</code> 后即启用真 SAM 3D 重建。
+                  当前为离线数字标本馆演示版（<span className="text-vermilion">Equus caballus · Femur</span>）；配置 <code className="font-mono">SAM3D_PROVIDER</code> + <code className="font-mono">FAL_KEY</code> 后自动切换为真 SAM 3D 在线重建。
                 </div>
               </div>
             </div>
