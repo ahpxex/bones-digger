@@ -43,3 +43,11 @@ next-env.d.ts
 # local-only generated analysis data (never committed)
 /data/analyses/
 /public/analyses/
+
+# tanstack start / vite / cloudflare
+/.output/
+/.wrangler/
+/dist/
+src/routeTree.gen.ts
+.dev.vars
+worker-configuration.d.ts

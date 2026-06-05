@@ -1,0 +1,33 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bones-digger",
+  "account_id": "a657a3e85e3a60cc228b04ba1966c656",
+  "compatibility_date": "2025-09-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "@tanstack/react-start/server-entry",
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "gujian.contextudio.com",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "AI_PROVIDER": "dashscope",
+    "DASHSCOPE_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "DASHSCOPE_VLM_MODEL_REALTIME": "qwen3.5-flash",
+    "DASHSCOPE_VLM_MODEL_THINKING": "qwen3.5-plus",
+    "THINKING_CHANNEL_THRESHOLD": "0.72",
+    "DASHSCOPE_EMBEDDING_MODEL": "text-embedding-v4",
+    "DASHSCOPE_EMBEDDING_DIM": "1024",
+    "SAM_PROVIDER": "stub"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "BONES",
+      "id": "951690d6200941feb220acc4da338ff7"
+    }
+  ]
+}
