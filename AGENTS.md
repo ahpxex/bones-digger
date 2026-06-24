@@ -6,7 +6,7 @@ Animal-bone (horse/cattle) identification app. **TanStack Start (Vite) on Cloudf
 - TanStack Start + TanStack Router (file-based routes in `src/routes/`), React 19, Vite 8, Tailwind v4 (`@tailwindcss/vite`).
 - Cloudflare Workers runtime (`nodejs_compat`). `process.env` is populated from `vars` + secrets at runtime.
 - Storage: **Cloudflare KV** (binding `BONES`). Keys: `analyses/{id}.json`, `assets/{id}-*.jpg`, `demo/{id}.jpg`. Binary assets are streamed via the `/r/$` route. Access bindings server-side with `import { env } from "cloudflare:workers"`.
-- AI: DashScope (Qwen3.5 VLM + text-embedding-v4) over `@ai-sdk/openai` / `fetch` in `src/lib/ai/`. `AI_PROVIDER=dashscope` (else `mock`).
+- AI: **Doubao via Volcengine ARK** (`doubao-seed-2-1-pro` VLM + `doubao-embedding-large-text` for RAG) over `fetch` in `src/lib/ai/`. `AI_PROVIDER=doubao` (key `ARK_API_KEY`). The OpenAI-compatible schema, JSON normalisation, and dual-channel fusion live in `src/lib/ai/analysis.ts`; providers (`doubao.ts`, legacy `dashscope.ts`) are thin wrappers. Doubao's reasoning pass is slow (minutes), so the deep "thinking" channel is **off by default** — set `ARK_THINKING_CHANNEL=on` to enable. Legacy Qwen/DashScope (`AI_PROVIDER=dashscope`, `@ai-sdk/openai`) is still wired; `mock` otherwise.
 
 ## Layout
 - `src/routes/` — pages (`index`, `analyze.$id`, `history`, `knowledge`) + server routes (`api.report.$id`, `r.$`).

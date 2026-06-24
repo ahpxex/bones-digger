@@ -12,7 +12,7 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          "基于 Qwen3.5 原生多模态与 RAG 专家知识库的田野考古动物骨骼种属鉴定平台。",
+          "基于豆包（Doubao）原生多模态与 RAG 专家知识库的田野考古动物骨骼种属鉴定平台。",
       },
     ],
     links: [

@@ -15,13 +15,11 @@
     }
   ],
   "vars": {
-    "AI_PROVIDER": "dashscope",
-    "DASHSCOPE_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    "DASHSCOPE_VLM_MODEL_REALTIME": "qwen3.5-flash",
-    "DASHSCOPE_VLM_MODEL_THINKING": "qwen3.5-plus",
+    "AI_PROVIDER": "doubao",
+    "ARK_BASE_URL": "https://ark.cn-beijing.volces.com/api/v3",
+    "ARK_VLM_MODEL": "doubao-seed-2-1-pro-260628",
+    "ARK_EMBEDDING_MODEL": "doubao-embedding-large-text-240915",
     "THINKING_CHANNEL_THRESHOLD": "0.72",
-    "DASHSCOPE_EMBEDDING_MODEL": "text-embedding-v4",
-    "DASHSCOPE_EMBEDDING_DIM": "1024",
     "SAM_PROVIDER": "stub"
   },
   "kv_namespaces": [

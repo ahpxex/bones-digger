@@ -119,9 +119,9 @@ export interface AnalysisResult {
     thinking?: Verdict;
   };
   knowledgeCards: KnowledgeCard[];
-  provider: "mock" | "dashscope";
-  /** "bigram" (fallback) or "qwen3-embedding" */
-  retrievalMode: "bigram" | "qwen3-embedding";
+  provider: "mock" | "dashscope" | "doubao";
+  /** "bigram" (fallback) or an embedding model tag */
+  retrievalMode: "bigram" | "qwen3-embedding" | "doubao-embedding";
   processingMs: number;
 }
 

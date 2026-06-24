@@ -22,7 +22,7 @@ const STEPS = [
   {
     title: "检索与比对",
     body:
-      "Qwen3-Embedding 在专家知识库中检索相关条目，Qwen3.5 视觉语言模型据此推理。",
+      "Doubao-Embedding 在专家知识库中检索相关条目，豆包视觉语言模型据此推理。",
   },
   {
     title: "鉴定与著录",
@@ -52,7 +52,7 @@ function HomePage() {
               <Divider />
               <p className="max-w-xl font-sans text-[15px] leading-[1.85] text-ink-soft">
                 依托
-                <span className="mx-1 text-vermilion">Qwen3.5 原生多模态</span>
+                <span className="mx-1 text-vermilion">豆包（Doubao）原生多模态</span>
                 与
                 <span className="mx-1 text-vermilion">SAM 3.1</span>
                 分割能力，结合动物考古学专家知识库，在田野发掘现场快速判断出土骨骼种属与骨位，并以可解释的推理依据链支撑判定结果。
@@ -159,13 +159,13 @@ function HomePage() {
                 实时通道
               </div>
               <h3 className="mt-2 font-serif text-2xl tracking-[0.12em] text-ink">
-                Qwen3.5-27B 稠密
+                Doubao-Seed Pro 多模态
               </h3>
               <p className="mt-4 font-sans text-[14px] leading-[1.9] text-ink-soft">
-                2026 年 2 月发布的原生多模态主力，延迟敏感场景优化。负责现场拍照上传后的实时鉴定回应，返回种属、骨位、置信度与六维度评分。
+                豆包原生多模态主力，thinking 关闭以优化延迟。负责现场拍照上传后的实时鉴定回应，返回种属、骨位、置信度与六维度评分。
               </p>
               <div className="mt-6 text-[12px] tracking-[0.22em] text-ink-muted">
-                Latency ~ 2 秒
+                Latency ~ 10 秒
               </div>
             </Frame>
             <Frame tone="paper" className="p-10">
@@ -173,10 +173,10 @@ function HomePage() {
                 精推通道
               </div>
               <h3 className="mt-2 font-serif text-2xl tracking-[0.12em] text-ink">
-                Qwen3.5-397B-A17B Thinking
+                Doubao-Seed Pro · Thinking
               </h3>
               <p className="mt-4 font-sans text-[14px] leading-[1.9] text-ink-soft">
-                旗舰 MoE，用于低置信度样本、疑似跨物种相似样本与争议结果的深度推理。输出可审计的思维链与多步证据。
+                同一模型开启 thinking 深度推理，用于低置信度样本、疑似跨物种相似样本与争议结果。输出可审计的思维链与多步证据（按需启用）。
               </p>
               <div className="mt-6 text-[12px] tracking-[0.22em] text-ink-muted">
                 Precision ~ 97%+ · 可回溯

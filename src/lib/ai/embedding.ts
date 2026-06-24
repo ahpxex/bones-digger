@@ -1,12 +1,38 @@
 import type { KnowledgeCard } from "@/lib/types";
 import { ANALYSIS_KNOWLEDGE_CARDS } from "@/lib/knowledge/bones";
 
-const EMBED_MODEL =
-  process.env.DASHSCOPE_EMBEDDING_MODEL ?? "text-embedding-v4";
-const EMBED_DIM = Number(process.env.DASHSCOPE_EMBEDDING_DIM ?? "1024");
-const EMBED_BASE =
-  process.env.DASHSCOPE_BASE_URL ??
-  "https://dashscope.aliyuncs.com/compatible-mode/v1";
+/**
+ * Embedding config is provider-aware. Doubao (Volcengine ARK) and Qwen
+ * (DashScope) both expose the OpenAI-compatible `/embeddings` endpoint, so the
+ * only differences are base URL, key, model, and whether `dimensions` is honoured.
+ */
+type EmbedConfig = {
+  base: string;
+  apiKey: string | undefined;
+  model: string;
+  /** Sent only when the model supports vector-dimension reduction. */
+  dimensions?: number;
+};
+
+function embedConfig(): EmbedConfig {
+  if ((process.env.AI_PROVIDER ?? "mock") === "doubao") {
+    return {
+      base: process.env.ARK_BASE_URL ?? "https://ark.cn-beijing.volces.com/api/v3",
+      apiKey: process.env.ARK_API_KEY,
+      model:
+        process.env.ARK_EMBEDDING_MODEL ?? "doubao-embedding-large-text-240915",
+      // doubao-embedding-large-text-240915 returns a fixed 4096-dim vector.
+    };
+  }
+  return {
+    base:
+      process.env.DASHSCOPE_BASE_URL ??
+      "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    apiKey: process.env.DASHSCOPE_API_KEY,
+    model: process.env.DASHSCOPE_EMBEDDING_MODEL ?? "text-embedding-v4",
+    dimensions: Number(process.env.DASHSCOPE_EMBEDDING_DIM ?? "1024"),
+  };
+}
 
 type CachedCard = {
   id: string;
@@ -21,22 +47,25 @@ function cardToText(card: KnowledgeCard): string {
 }
 
 async function embedBatch(texts: string[]): Promise<Float32Array[]> {
-  const apiKey = process.env.DASHSCOPE_API_KEY;
-  if (!apiKey) {
-    throw new Error("DASHSCOPE_API_KEY not set — cannot call embeddings.");
+  const cfg = embedConfig();
+  if (!cfg.apiKey) {
+    throw new Error(
+      "Embedding API key not set (ARK_API_KEY / DASHSCOPE_API_KEY) — cannot call embeddings.",
+    );
   }
-  const resp = await fetch(`${EMBED_BASE}/embeddings`, {
+  const body: Record<string, unknown> = {
+    model: cfg.model,
+    input: texts,
+    encoding_format: "float",
+  };
+  if (cfg.dimensions) body.dimensions = cfg.dimensions;
+  const resp = await fetch(`${cfg.base}/embeddings`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${cfg.apiKey}`,
     },
-    body: JSON.stringify({
-      model: EMBED_MODEL,
-      input: texts,
-      dimensions: EMBED_DIM,
-      encoding_format: "float",
-    }),
+    body: JSON.stringify(body),
   });
   if (!resp.ok) {
     const err = await resp.text();
@@ -101,7 +130,7 @@ export async function retrieveByEmbedding(
   query: string,
   topK = 8,
 ): Promise<KnowledgeCard[] | null> {
-  if (!process.env.DASHSCOPE_API_KEY) return null;
+  if (!embedConfig().apiKey) return null;
   try {
     const index = await buildKnowledgeIndex();
     const [qVec] = await embedBatch([query]);

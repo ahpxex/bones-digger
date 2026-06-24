@@ -202,7 +202,7 @@ export function DropZone() {
           {isPreparing
             ? "图片预处理中：压缩 → 校验 → 提交准备 …"
             : pending
-              ? "鉴定中：SAM 分割 → RAG 检索 → Qwen 推理 …"
+              ? "鉴定中：SAM 分割 → RAG 检索 → 豆包推理 …"
               : "系统将依次进行分割、检索、鉴定三阶段"}
         </div>
         <button

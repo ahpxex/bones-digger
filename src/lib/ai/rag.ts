@@ -48,17 +48,19 @@ export function retrieveByBigram(query: string, topK = 8): KnowledgeCard[] {
 
 export interface RetrievalResult {
   cards: KnowledgeCard[];
-  mode: "qwen3-embedding" | "bigram";
+  mode: "qwen3-embedding" | "doubao-embedding" | "bigram";
 }
 
 export async function retrieveKnowledge(
   query: string,
   topK = 8,
 ): Promise<RetrievalResult> {
-  if (process.env.AI_PROVIDER === "dashscope") {
+  const provider = process.env.AI_PROVIDER;
+  if (provider === "dashscope" || provider === "doubao") {
     const viaEmbedding = await retrieveByEmbedding(query, topK);
     if (viaEmbedding && viaEmbedding.length > 0) {
-      return { cards: viaEmbedding, mode: "qwen3-embedding" };
+      const mode = provider === "doubao" ? "doubao-embedding" : "qwen3-embedding";
+      return { cards: viaEmbedding, mode };
     }
   }
   return { cards: retrieveByBigram(query, topK), mode: "bigram" };

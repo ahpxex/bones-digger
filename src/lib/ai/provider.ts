@@ -1,6 +1,7 @@
 import type { AnalysisResult, KnowledgeCard } from "@/lib/types";
 import { mockProvider } from "./mock";
 import { dashScopeProvider } from "./dashscope";
+import { doubaoProvider } from "./doubao";
 
 export interface AnalyzeInput {
   id: string;
@@ -12,7 +13,7 @@ export interface AnalyzeInput {
 }
 
 export interface Provider {
-  name: "mock" | "dashscope";
+  name: "mock" | "dashscope" | "doubao";
   analyze(
     input: AnalyzeInput,
     retrieved: KnowledgeCard[],
@@ -32,5 +33,7 @@ export interface Provider {
 
 export function selectProvider(): Provider {
   const mode = process.env.AI_PROVIDER ?? "mock";
-  return mode === "dashscope" ? dashScopeProvider : mockProvider;
+  if (mode === "doubao") return doubaoProvider;
+  if (mode === "dashscope") return dashScopeProvider;
+  return mockProvider;
 }

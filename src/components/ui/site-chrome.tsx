@@ -49,7 +49,7 @@ export function SiteFooter() {
             骨鉴
           </div>
           <p className="mt-3 leading-relaxed">
-            中国社会科学院考古研究所合作项目。以 Qwen3.5
+            中国社会科学院考古研究所合作项目。以豆包（Doubao）
             原生多模态与专家知识库为底座，服务田野考古现场的动物骨骼种属鉴定。
           </p>
         </div>
@@ -58,9 +58,9 @@ export function SiteFooter() {
             技术构成
           </div>
           <ul className="mt-3 space-y-1 leading-relaxed">
-            <li>Qwen3.5-Flash · Qwen3.5-Plus (Thinking)</li>
+            <li>Doubao-Seed Pro 多模态 (实时 / Thinking)</li>
             <li>SAM 3.1 Object Multiplex · SAM 3D Objects</li>
-            <li>Qwen3-Embedding · RAG</li>
+            <li>Doubao-Embedding · RAG</li>
             <li>TanStack Start · React 19 · Cloudflare Workers</li>
           </ul>
         </div>
