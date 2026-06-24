@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { analyzeBone } from "@/server/analyze";
 import { cn } from "@/lib/utils";
+import { AnalysisOverlay } from "./analysis-overlay";
 
 const MAX_SOURCE_BYTES = 16 * 1024 * 1024;
 const TARGET_UPLOAD_BYTES = 3.6 * 1024 * 1024;
@@ -115,6 +116,7 @@ export function DropZone() {
 
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+      <AnalysisOverlay active={pending} />
       <div
         className={cn(
           "cer-corners relative grid min-h-[340px] cursor-pointer place-items-center border-2 border-dashed p-10 transition-all",

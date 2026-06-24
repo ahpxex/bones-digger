@@ -3,6 +3,7 @@ import { useRouter } from "@tanstack/react-router";
 import { analyzeDemo } from "@/server/analyze";
 import manifest from "@/lib/demo-manifest.json";
 import type { DemoEntry } from "@/lib/demo";
+import { AnalysisOverlay } from "./analysis-overlay";
 
 const entries = manifest as DemoEntry[];
 
@@ -28,6 +29,7 @@ export function DemoGallery() {
 
   return (
     <div>
+      <AnalysisOverlay active={loadingId !== null} />
       <div className="mb-5 flex items-baseline justify-between gap-4">
         <div>
           <div className="font-serif text-[13px] tracking-[0.28em] text-vermilion">

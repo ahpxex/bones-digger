@@ -6,12 +6,16 @@ export function ImageTriptych({
   heatmap,
   subjectBox,
   featureRegions,
+  activeKey,
+  onHover,
 }: {
   original: string;
   segmented?: string;
   heatmap?: string;
   subjectBox?: BoundingBox;
   featureRegions?: FeatureRegion[];
+  activeKey?: string | null;
+  onHover?: (key: string | null) => void;
 }) {
   const hasRegions = Array.isArray(featureRegions) && featureRegions.length > 0;
   const hasSubject = Boolean(subjectBox);
@@ -72,6 +76,8 @@ export function ImageTriptych({
               <HeatmapOverlay
                 subject={subjectBox}
                 regions={featureRegions ?? []}
+                activeKey={activeKey ?? null}
+                onHover={onHover}
               />
             )}
           </div>
@@ -122,9 +128,13 @@ function SubjectOverlay({ box }: { box: BoundingBox }) {
 function HeatmapOverlay({
   subject,
   regions,
+  activeKey,
+  onHover,
 }: {
   subject?: BoundingBox;
   regions: FeatureRegion[];
+  activeKey?: string | null;
+  onHover?: (key: string | null) => void;
 }) {
   if (regions.length === 0 && !subject) {
     return (
@@ -156,8 +166,13 @@ function HeatmapOverlay({
       )}
       {sortedRegions.map((r, i) => {
         const intensity = 0.35 + 0.55 * r.weight;
+        const isActive = activeKey != null && r.label === activeKey;
+        const dimmed = activeKey != null && !isActive;
         return (
-          <div key={`${r.label}-${i}`}>
+          <div
+            key={`${r.label}-${i}`}
+            style={{ opacity: dimmed ? 0.22 : 1, transition: "opacity 0.2s" }}
+          >
             <div
               className="absolute"
               style={{
@@ -165,28 +180,33 @@ function HeatmapOverlay({
                 top: pct(r.y),
                 width: pct(r.w),
                 height: pct(r.h),
-                background: `radial-gradient(circle at center, rgba(220, 68, 58, ${intensity}) 0%, rgba(220, 68, 58, ${intensity * 0.55}) 45%, transparent 78%)`,
+                background: `radial-gradient(circle at center, rgba(220, 68, 58, ${isActive ? Math.min(0.95, intensity + 0.25) : intensity}) 0%, rgba(220, 68, 58, ${intensity * 0.55}) 45%, transparent 78%)`,
                 mixBlendMode: "screen",
                 filter: "blur(2px)",
               }}
             />
             <div
-              className="absolute border border-vermilion/80"
+              className={`absolute cursor-pointer ${isActive ? "border-2 border-vermilion animate-pulse" : "border border-vermilion/80"}`}
               style={{
                 left: pct(r.x),
                 top: pct(r.y),
                 width: pct(r.w),
                 height: pct(r.h),
-                boxShadow: "0 0 0 1px rgba(245,241,232,0.7)",
+                boxShadow: isActive
+                  ? "0 0 0 2px rgba(245,241,232,0.9), 0 0 12px 2px rgba(220,68,58,0.6)"
+                  : "0 0 0 1px rgba(245,241,232,0.7)",
               }}
+              onMouseEnter={() => onHover?.(r.label)}
+              onMouseLeave={() => onHover?.(null)}
             />
-            {i < 3 && (
+            {(i < 3 || isActive) && (
               <div
-                className="absolute font-mono text-[9px] tracking-[0.2em] bg-vermilion text-paper px-1.5 py-[1px]"
+                className={`absolute font-mono text-[9px] tracking-[0.2em] px-1.5 py-[1px] ${isActive ? "bg-vermilion-deep text-paper" : "bg-vermilion text-paper"}`}
                 style={{
                   left: pct(r.x),
                   top: `calc(${pct(r.y + r.h)} + 2px)`,
-                  maxWidth: "60%",
+                  maxWidth: "70%",
+                  zIndex: isActive ? 5 : 1,
                 }}
               >
                 {i + 1}. {r.label}

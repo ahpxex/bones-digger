@@ -4,7 +4,7 @@ import { Divider, Frame } from "@/components/ui/frame";
 import { SectionTitle } from "@/components/ui/section-title";
 import { DemoGallery } from "@/components/upload/demo-gallery";
 import { DropZone } from "@/components/upload/drop-zone";
-import { SplatPreviewViewer, specimenModelFor } from "@/components/splat/viewer-preview";
+import { SpecimenShowcase } from "@/components/splat/specimen-showcase";
 import { toChineseNumeral } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: HomePage });
@@ -124,11 +124,7 @@ function HomePage() {
           <Frame tone="paper" className="mt-8 p-6">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
               <div className="lg:col-span-3">
-                <SplatPreviewViewer
-                  glbUrl={specimenModelFor("马", "头骨")}
-                  species="马"
-                  position="头骨"
-                />
+                <SpecimenShowcase />
               </div>
               <div className="lg:col-span-2">
                 <p className="font-sans text-[14px] leading-[1.9] text-ink-soft">

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { SiteFooter, SiteHeader } from "@/components/ui/site-chrome";
 import { Divider, Frame } from "@/components/ui/frame";
@@ -46,6 +47,8 @@ function NotFound() {
 function AnalyzePage() {
   const result = Route.useLoaderData();
   const router = useRouter();
+  // Shared hover link between the evidence chain and the image region boxes.
+  const [activeKey, setActiveKey] = useState<string | null>(null);
 
   async function handleDelete() {
     await deleteAnalysisFn({ data: { id: result.id } });
@@ -90,6 +93,8 @@ function AnalyzePage() {
                   heatmap={result.heatmapPath}
                   subjectBox={result.subjectBox}
                   featureRegions={result.featureRegions}
+                  activeKey={activeKey}
+                  onHover={setActiveKey}
                 />
               </Frame>
             </div>
@@ -187,7 +192,11 @@ function AnalyzePage() {
               证据逐条
             </SectionTitle>
             <Frame tone="paper" className="mt-8 p-8">
-              <EvidenceChain evidence={result.evidence} />
+              <EvidenceChain
+                evidence={result.evidence}
+                activeKey={activeKey}
+                onHover={setActiveKey}
+              />
             </Frame>
           </section>
 
