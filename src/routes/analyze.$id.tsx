@@ -154,97 +154,10 @@ function AnalyzePage() {
             </div>
           </section>
 
-          <Divider label="鉴定指标" />
-
-          {/* Dimensions + ranking */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-            <div className="lg:col-span-7">
-              <SectionTitle
-                numeral="贰 · 六维度评分"
-                subtitle="Multi-axis dimensional scoring"
-              >
-                多维度评分
-              </SectionTitle>
-              <Frame tone="paper" className="mt-8 p-6">
-                <DimensionRadar dimensions={result.dimensions} />
-              </Frame>
-            </div>
-            <div className="lg:col-span-5">
-              <SectionTitle
-                numeral="叁 · 候选排序"
-                subtitle="Ranked candidates"
-              >
-                置信度排序
-              </SectionTitle>
-              <Frame tone="paper" className="mt-8 p-8">
-                <ConfidenceRanking ranking={result.verdict.ranking} />
-              </Frame>
-            </div>
-          </section>
-
-          <Divider label="推理依据链" />
-
+          <Divider label="三维数字标本" />
           <section>
             <SectionTitle
-              numeral="肆 · 依据链"
-              subtitle="Evidence chain · 图像观察对照专家特征"
-            >
-              证据逐条
-            </SectionTitle>
-            <Frame tone="paper" className="mt-8 p-8">
-              <EvidenceChain
-                evidence={result.evidence}
-                activeKey={activeKey}
-                onHover={setActiveKey}
-              />
-            </Frame>
-          </section>
-
-          <Divider label="思维推理" />
-
-          <section>
-            <SectionTitle
-              numeral="伍 · 推理链"
-              subtitle="Chain of thought · 透明可审计"
-            >
-              思维链
-            </SectionTitle>
-            <div className="mt-8 flex flex-col gap-6">
-              <div>
-                <div className="mb-3 font-serif text-[12px] tracking-[0.3em] text-bronze-dark">
-                  实时通道 · Realtime
-                </div>
-                <ReasoningPanel reasoning={result.reasoning} />
-              </div>
-              {result.thinkingReasoning && (
-                <div>
-                  <div className="mb-3 font-serif text-[12px] tracking-[0.3em] text-vermilion">
-                    精推通道 · Thinking
-                  </div>
-                  <ReasoningPanel reasoning={result.thinkingReasoning} />
-                </div>
-              )}
-            </div>
-          </section>
-
-          <Divider label="关联专家知识" />
-
-          <section>
-            <SectionTitle
-              numeral="陆 · 知识卡"
-              subtitle="Expert reference cards"
-            >
-              关联知识
-            </SectionTitle>
-            <div className="mt-8">
-              <KnowledgeCardGrid cards={result.knowledgeCards} />
-            </div>
-          </section>
-
-          <Divider label="SAM 3D 数字标本" />
-          <section>
-            <SectionTitle
-              numeral="柒 · 数字标本"
+              numeral="贰 · 数字标本"
               subtitle={
                 result.glbPath
                   ? "SAM 3D · single-image reconstruction"
@@ -271,6 +184,93 @@ function AnalyzePage() {
                 </div>
               )}
             </Frame>
+          </section>
+
+          <Divider label="鉴定指标" />
+
+          {/* Dimensions + ranking */}
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div className="lg:col-span-7">
+              <SectionTitle
+                numeral="叁 · 六维度评分"
+                subtitle="Multi-axis dimensional scoring"
+              >
+                多维度评分
+              </SectionTitle>
+              <Frame tone="paper" className="mt-8 p-6">
+                <DimensionRadar dimensions={result.dimensions} />
+              </Frame>
+            </div>
+            <div className="lg:col-span-5">
+              <SectionTitle
+                numeral="肆 · 候选排序"
+                subtitle="Ranked candidates"
+              >
+                置信度排序
+              </SectionTitle>
+              <Frame tone="paper" className="mt-8 p-8">
+                <ConfidenceRanking ranking={result.verdict.ranking} />
+              </Frame>
+            </div>
+          </section>
+
+          <Divider label="推理依据链" />
+
+          <section>
+            <SectionTitle
+              numeral="伍 · 依据链"
+              subtitle="Evidence chain · 图像观察对照专家特征"
+            >
+              证据逐条
+            </SectionTitle>
+            <Frame tone="paper" className="mt-8 p-8">
+              <EvidenceChain
+                evidence={result.evidence}
+                activeKey={activeKey}
+                onHover={setActiveKey}
+              />
+            </Frame>
+          </section>
+
+          <Divider label="思维推理" />
+
+          <section>
+            <SectionTitle
+              numeral="陆 · 推理链"
+              subtitle="Chain of thought · 透明可审计"
+            >
+              思维链
+            </SectionTitle>
+            <div className="mt-8 flex flex-col gap-6">
+              <div>
+                <div className="mb-3 font-serif text-[12px] tracking-[0.3em] text-bronze-dark">
+                  实时通道 · Realtime
+                </div>
+                <ReasoningPanel reasoning={result.reasoning} />
+              </div>
+              {result.thinkingReasoning && (
+                <div>
+                  <div className="mb-3 font-serif text-[12px] tracking-[0.3em] text-vermilion">
+                    精推通道 · Thinking
+                  </div>
+                  <ReasoningPanel reasoning={result.thinkingReasoning} />
+                </div>
+              )}
+            </div>
+          </section>
+
+          <Divider label="关联专家知识" />
+
+          <section>
+            <SectionTitle
+              numeral="柒 · 知识卡"
+              subtitle="Expert reference cards"
+            >
+              关联知识
+            </SectionTitle>
+            <div className="mt-8">
+              <KnowledgeCardGrid cards={result.knowledgeCards} />
+            </div>
           </section>
 
           <Divider />
