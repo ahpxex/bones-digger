@@ -18,6 +18,5 @@ Animal-bone (horse/cattle) identification app. **TanStack Start (Vite) on Cloudf
 ## Dev / deploy
 - Dev: `bun run dev` (Vite + local KV emulation; reads `.dev.vars`).
 - Build: `bun run build`. Deploy: `bun run deploy` (needs `CLOUDFLARE_ACCOUNT_ID` set; Cloudflare API via proxy `127.0.0.1:7890`).
-- CI: push to `main` deploys via `.github/workflows/deploy.yml` (needs the `CLOUDFLARE_API_TOKEN` GitHub secret).
 - Live: https://bones-digger.ctxflow.workers.dev (custom domain gujian.contextudio.com once its old Vercel DNS record is removed).
 - Secrets via `wrangler secret put` persist across deploys; non-secret config lives in `wrangler.jsonc` `vars`.
