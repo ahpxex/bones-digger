@@ -487,6 +487,91 @@ body {
   );
 }
 
+/* Hex radar — value polygon grows from centre on mount */
+@keyframes cer-radar-grow {
+  from {
+    transform: scale(0.04);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.cer-radar-grow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cer-radar-grow 900ms cubic-bezier(0.2, 0.9, 0.25, 1.1) forwards;
+}
+
+/* Soft conic sweep behind the knowledge-graph stage */
+@keyframes cer-conic-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cer-conic {
+  background: conic-gradient(
+    from 0deg,
+    rgba(157, 43, 51, 0.05),
+    rgba(184, 151, 102, 0.05),
+    rgba(31, 58, 95, 0.04),
+    rgba(157, 43, 51, 0.05)
+  );
+  animation: cer-conic-spin 60s linear infinite;
+}
+
+/* Selectable rail item — bone-position selector */
+.cer-rail-item {
+  position: relative;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+.cer-rail-item[data-on="true"] {
+  background: color-mix(in oklch, var(--color-vermilion) 8%, transparent);
+}
+
+/* Vertical-writing label — 竖排 */
+.cer-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  letter-spacing: 0.28em;
+}
+
+/* Tab underline indicator */
+.cer-tab {
+  position: relative;
+  transition: color 200ms ease;
+}
+.cer-tab::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: -1px;
+  height: 2px;
+  background: var(--color-vermilion);
+  transition: left 220ms ease, right 220ms ease;
+}
+.cer-tab[data-on="true"]::after {
+  left: 0;
+  right: 0;
+}
+
+/* Cross-fade for swapped content panels */
+@keyframes cer-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.cer-panel-in {
+  animation: cer-panel-in 420ms cubic-bezier(0.2, 0.9, 0.25, 1) forwards;
+}
+
 /* Scroll-in glow underline that draws on reveal */
 @keyframes cer-underline-draw {
   from {
