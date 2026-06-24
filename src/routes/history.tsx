@@ -1,10 +1,11 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { useCallback, useState } from "react";
 import { SiteFooter, SiteHeader } from "@/components/ui/site-chrome";
 import { Divider, Frame } from "@/components/ui/frame";
 import { SectionTitle } from "@/components/ui/section-title";
+import { RevealCard } from "@/components/history/reveal-card";
 import { listHistory } from "@/server/data";
 import { deleteAnalysisFn } from "@/server/analyze";
-import { formatTimestamp } from "@/lib/utils";
 
 export const Route = createFileRoute("/history")({
   loader: async () => await listHistory(),
@@ -14,6 +15,15 @@ export const Route = createFileRoute("/history")({
 function HistoryPage() {
   const analyses = Route.useLoaderData();
   const router = useRouter();
+
+  // Cascade gate: cards with index <= `unlocked` may begin loading. The next
+  // card unlocks only once the current one's image has arrived, so images
+  // appear one-by-one (a forensic scan) rather than all at once.
+  const [unlocked, setUnlocked] = useState(0);
+  const advance = useCallback(
+    (next: number) => setUnlocked((cur) => Math.max(cur, next)),
+    [],
+  );
 
   async function handleDelete(id: string) {
     await deleteAnalysisFn({ data: { id } });
@@ -58,53 +68,15 @@ function HistoryPage() {
                 鉴定名册
               </SectionTitle>
               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {analyses.map((item) => (
-                  <article
+                {analyses.map((item, i) => (
+                  <RevealCard
                     key={item.id}
-                    className="cer-paper cer-corners p-5 flex flex-col gap-4 cer-glow-hover"
-                  >
-                    <Link
-                      to="/analyze/$id"
-                      params={{ id: item.id }}
-                      className="group flex flex-col gap-4"
-                    >
-                      <div className="relative aspect-[4/3] overflow-hidden bg-paper-warm cer-hairline">
-                        <img
-                          src={item.imagePath}
-                          alt={`${item.species}·${item.position}`}
-                          className="absolute inset-0 h-full w-full object-cover transition-transform group-hover:scale-[1.03]"
-                        />
-                      </div>
-                      <div className="flex items-baseline justify-between">
-                        <div>
-                          <div className="font-serif text-xl font-semibold tracking-[0.12em] text-ink group-hover:text-vermilion transition-colors">
-                            {item.species}·{item.position}
-                          </div>
-                          <div className="mt-1 font-mono text-[12px] tracking-[0.12em] text-ink-muted">
-                            {formatTimestamp(item.timestamp)}
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-serif text-[10px] tracking-[0.24em] text-bronze-dark">
-                            confidence
-                          </div>
-                          <div className="font-mono text-[18px] text-vermilion tabular-nums">
-                            {(item.confidence * 100).toFixed(1)}%
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                    <div className="flex items-center justify-between border-t border-bronze/30 pt-3 text-[11px] tracking-[0.2em] text-ink-muted">
-                      <span className="font-mono">{item.id}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleDelete(item.id)}
-                        className="text-ink-muted hover:text-vermilion transition-colors"
-                      >
-                        删除
-                      </button>
-                    </div>
-                  </article>
+                    item={item}
+                    index={i}
+                    activated={i <= unlocked}
+                    onImageReady={() => advance(i + 1)}
+                    onDelete={() => handleDelete(item.id)}
+                  />
                 ))}
               </div>
             </section>

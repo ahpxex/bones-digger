@@ -652,3 +652,231 @@ body {
   transform-origin: left;
   animation: cer-underline-draw 800ms ease-out 200ms forwards;
 }
+
+/* ========== History · forensic scan reveal ========== */
+
+/* Skeleton base behind a loading image — deep indigo with a bronze weave */
+.cer-scan-skeleton {
+  background:
+    linear-gradient(
+      135deg,
+      rgba(19, 39, 74, 0.96) 0%,
+      rgba(31, 58, 95, 0.92) 50%,
+      rgba(19, 39, 74, 0.96) 100%
+    );
+  background-size: 200% 200%;
+  animation: cer-scan-skeleton-drift 3.5s ease-in-out infinite;
+}
+@keyframes cer-scan-skeleton-drift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Shimmer band sweeping across the skeleton */
+.cer-scan-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(184, 151, 102, 0.18) 45%,
+    rgba(212, 188, 143, 0.32) 50%,
+    rgba(184, 151, 102, 0.18) 55%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: cer-scan-shimmer-move 1.7s ease-in-out infinite;
+}
+@keyframes cer-scan-shimmer-move {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* HUD corner brackets */
+.cer-scan-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: rgba(212, 188, 143, 0.85);
+  pointer-events: none;
+}
+
+/* Horizontal scan sweep line — top to bottom */
+.cer-scan-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 188, 143, 0.4) 20%,
+    rgba(245, 241, 232, 0.95) 50%,
+    rgba(212, 188, 143, 0.4) 80%,
+    transparent
+  );
+  box-shadow:
+    0 0 12px 2px rgba(212, 188, 143, 0.55),
+    0 0 28px 6px rgba(184, 53, 64, 0.25);
+  animation: cer-scan-sweep-move 1.15s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes cer-scan-sweep-move {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* Animated trailing dots "· · ·" */
+.cer-scan-dots {
+  display: inline-flex;
+  gap: 1px;
+  color: var(--color-vermilion);
+  font-weight: 700;
+}
+.cer-scan-dots span {
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.25;
+  animation: cer-scan-dot-blink 1.2s ease-in-out infinite;
+}
+.cer-scan-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.cer-scan-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.cer-scan-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes cer-scan-dot-blink {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+
+/* Progress bar that fills over SCAN_MS while scanning */
+.cer-scan-progress {
+  position: relative;
+  height: 2px;
+  width: 100%;
+  overflow: hidden;
+  background: rgba(184, 151, 102, 0.18);
+  border-radius: 1px;
+}
+.cer-scan-progress-bar {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  background: linear-gradient(
+    90deg,
+    var(--color-bronze),
+    var(--color-vermilion-bright)
+  );
+  box-shadow: 0 0 8px rgba(184, 53, 64, 0.4);
+  transform: scaleX(0);
+  animation: cer-scan-fill var(--scan-ms, 1150ms) cubic-bezier(
+      0.3,
+      0,
+      0.2,
+      1
+    ) forwards;
+}
+@keyframes cer-scan-fill {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* Locked-in verdict badge once scanning completes */
+.cer-scan-locked {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(74, 107, 88, 0.95);
+  color: var(--color-paper);
+  box-shadow: 0 0 0 2px rgba(245, 241, 232, 0.85);
+  animation: cer-scan-lock-in 480ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+@keyframes cer-scan-lock-in {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.cer-scan-lock-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  box-shadow: 0 0 0 0 rgba(74, 107, 88, 0.5);
+  animation: cer-scan-lock-ring 1.6s ease-out 0.3s infinite;
+}
+@keyframes cer-scan-lock-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 107, 88, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 10px rgba(74, 107, 88, 0);
+  }
+}
+
+/* Result rail materialising once the verdict locks in */
+@keyframes cer-scan-result-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+.cer-scan-result-in {
+  animation: cer-scan-result-in 520ms cubic-bezier(0.2, 0.9, 0.25, 1) both;
+}
