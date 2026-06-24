@@ -132,12 +132,14 @@ export function SplatPreviewViewer({
   reconstruction = false,
   species = "马",
   position = "股骨",
+  heightClass = "h-[420px]",
 }: {
   glbUrl?: string;
   /** True only for a genuine SAM-3D reconstruction of the uploaded image. */
   reconstruction?: boolean;
   species?: Species;
   position?: BonePosition;
+  heightClass?: string;
 }) {
   const hasGlb = typeof glbUrl === "string" && glbUrl.length > 0;
   // Gentle orbit until the viewer touches it — never fights an inspecting judge,
@@ -153,7 +155,7 @@ export function SplatPreviewViewer({
   const fallback = <BoneSpecimen species={species} position={position} />;
 
   return (
-    <div className="relative h-[420px] w-full overflow-hidden">
+    <div className={`relative ${heightClass} w-full overflow-hidden`}>
       <ClientOnly
         fallback={
           <div className="absolute inset-0 grid place-items-center font-sans text-[12px] tracking-[0.22em] text-ink-muted">
@@ -194,14 +196,6 @@ export function SplatPreviewViewer({
           ) : (
             fallback
           )}
-          <mesh
-            rotation={[-Math.PI / 2, 0, 0]}
-            position={[0, -1.9, 0]}
-            receiveShadow
-          >
-            <circleGeometry args={[3.6, 64]} />
-            <meshStandardMaterial color="#ebe4d2" roughness={1} />
-          </mesh>
           <OrbitControls
             enableDamping
             makeDefault

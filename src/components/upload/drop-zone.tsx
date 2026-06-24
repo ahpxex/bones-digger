@@ -119,7 +119,7 @@ export function DropZone() {
       <AnalysisOverlay active={pending} />
       <div
         className={cn(
-          "cer-corners relative grid min-h-[340px] cursor-pointer place-items-center border-2 border-dashed p-10 transition-all",
+          "cer-corners relative grid min-h-[260px] cursor-pointer place-items-center border-2 border-dashed p-10 transition-all",
           isHovering
             ? "border-vermilion bg-paper-warm"
             : "border-bronze bg-paper",

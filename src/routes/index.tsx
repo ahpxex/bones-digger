@@ -38,7 +38,7 @@ function HomePage() {
       <main className="flex-1">
         <section className="relative overflow-hidden">
           <div className="absolute left-0 top-0 bottom-0 w-[3px] cer-vbar opacity-60" />
-          <div className="mx-auto max-w-[1240px] px-8 py-20 grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <div className="mx-auto max-w-[1240px] px-8 pt-10 pb-8 grid grid-cols-1 lg:grid-cols-12 gap-10">
             <div className="lg:col-span-7">
               <div className="font-serif text-[13px] tracking-[0.34em] text-vermilion">
                 中国社会科学院考古研究所 · 合作项目
@@ -82,6 +82,19 @@ function HomePage() {
               </Frame>
             </div>
           </div>
+          <div className="mx-auto max-w-[1240px] px-8 pb-14">
+            <div className="mb-4 flex items-baseline gap-4">
+              <span className="font-serif text-[13px] tracking-[0.28em] text-vermilion">
+                数字标本馆
+              </span>
+              <span className="font-sans text-[11px] tracking-[0.22em] text-ink-muted">
+                3D Specimen Library · 真实光度扫描 · 点击切换骨位
+              </span>
+            </div>
+            <Frame tone="paper" className="p-6">
+              <SpecimenShowcase />
+            </Frame>
+          </div>
         </section>
 
         <section className="mx-auto max-w-[1240px] px-8 py-10">
@@ -116,37 +129,7 @@ function HomePage() {
 
         <section className="mx-auto max-w-[1240px] px-8 py-16">
           <SectionTitle
-            numeral="肆 · 数字标本"
-            subtitle="三维数字标本 · 旋转比对"
-          >
-            标本馆预览
-          </SectionTitle>
-          <Frame tone="paper" className="mt-8 p-6">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
-              <div className="lg:col-span-3">
-                <SpecimenShowcase />
-              </div>
-              <div className="lg:col-span-2">
-                <p className="font-sans text-[14px] leading-[1.9] text-ink-soft">
-                  依据鉴定结论，从
-                  <span className="mx-1 text-vermilion">三维数字标本馆</span>
-                  实时调取对应物种的高精度骨骼扫描标本，支持 360° 旋转、缩放，逐处比对形态细节。浏览器端经
-                  <span className="mx-1 text-vermilion">@react-three/fiber</span>
-                  +
-                  <span className="mx-1 text-vermilion">@react-three/drei</span>
-                  的 useGLTF 实时渲染。
-                </p>
-                <div className="mt-6 text-[11px] tracking-[0.22em] text-ink-muted">
-                  标本采自真实骨骼的光度扫描（photogrammetry），非程序生成。
-                </div>
-              </div>
-            </div>
-          </Frame>
-        </section>
-
-        <section className="mx-auto max-w-[1240px] px-8 py-16">
-          <SectionTitle
-            numeral="伍 · 技术构成"
+            numeral="肆 · 技术构成"
             subtitle="Dual-channel VLM · RAG-grounded"
           >
             双通道推理

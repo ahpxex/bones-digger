@@ -28,6 +28,7 @@ export function SpecimenShowcase() {
         glbUrl={specimenModelFor(cur.species, cur.position)}
         species={cur.species}
         position={cur.position}
+        heightClass="h-[340px]"
       />
       <div className="mt-4 flex flex-wrap gap-2">
         {SPECIMENS.map((sp, i) => {
