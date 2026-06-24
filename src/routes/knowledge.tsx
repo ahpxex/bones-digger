@@ -22,12 +22,16 @@ function KnowledgePage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="flex-1">
-        <div className="mx-auto max-w-[1400px] px-8 py-12">
-          <div className="font-serif text-[13px] tracking-[0.34em] text-vermilion">
-            专家鉴定知识 · 动物考古参考
+      <main className="flex-1 relative">
+        <div className="absolute inset-0 cer-grid-bg opacity-20 pointer-events-none" />
+        <div className="relative mx-auto max-w-[1400px] px-8 py-12">
+          <div className="flex items-center gap-3">
+            <span className="inline-block h-2 w-2 rounded-full bg-jade cer-pulse-dot" />
+            <div className="font-serif text-[13px] tracking-[0.34em] text-vermilion">
+              专家鉴定知识 · 动物考古参考
+            </div>
           </div>
-          <h1 className="mt-4 font-serif text-5xl font-semibold tracking-[0.1em] text-ink">
+          <h1 className="mt-4 font-serif text-5xl font-bold tracking-[0.1em] cer-gradient-text cer-text-glow">
             知识图典
           </h1>
           <p className="mt-4 max-w-3xl font-sans text-[14px] leading-[1.9] text-ink-soft">
@@ -37,19 +41,19 @@ function KnowledgePage() {
             <span className="mx-1 text-vermilion">品种志</span>
             ——以六维档案描绘中国古代主要马牛生态型的身世、遗址、食谱、职业、病理与礼制，为鉴定结果提供文化语境。
           </p>
-          <div className="mt-6 flex flex-wrap gap-6 text-[12px] tracking-[0.22em] text-ink-muted">
-            <div>
-              <span className="text-bronze">物种</span>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <span className="cer-badge">
+              <span className="text-bronze mr-1">物种</span>
               {ANALYSIS_SPECIES_LIST.join(" · ")}
-            </div>
-            <div>
-              <span className="text-bronze">形态条目</span>
+            </span>
+            <span className="cer-badge">
+              <span className="text-bronze mr-1">形态条目</span>
               {ANALYSIS_KNOWLEDGE_CARDS.length}
-            </div>
-            <div>
-              <span className="text-bronze">品种档案</span>
+            </span>
+            <span className="cer-badge">
+              <span className="text-bronze mr-1">品种档案</span>
               {ANCIENT_BREEDS.length}
-            </div>
+            </span>
           </div>
           <Divider label="物种 × 骨位对照" />
 
@@ -71,7 +75,7 @@ function KnowledgePage() {
                       return (
                         <article
                           key={`${species}-${position}`}
-                          className="cer-paper cer-corners p-6"
+                          className="cer-paper cer-corners p-6 cer-glow-hover"
                         >
                           <header className="flex items-baseline justify-between mb-3">
                             <h3 className="font-serif text-lg font-semibold tracking-[0.12em] text-ink">
@@ -133,7 +137,7 @@ function KnowledgePage() {
                       {groupBlock.breeds.map((breed) => (
                         <article
                           key={breed.id}
-                          className="cer-paper cer-corners p-7"
+                          className="cer-paper cer-corners p-7 cer-glow-hover"
                         >
                           <header className="mb-4">
                             <div className="font-serif text-[11px] tracking-[0.3em] text-bronze">

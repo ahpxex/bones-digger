@@ -23,12 +23,16 @@ function HistoryPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
-      <main className="flex-1">
-        <div className="mx-auto max-w-[1240px] px-8 py-12">
-          <div className="font-serif text-[13px] tracking-[0.34em] text-vermilion">
-            历次鉴定 · 鉴定著录
+      <main className="flex-1 relative">
+        <div className="absolute inset-0 cer-grid-bg opacity-20 pointer-events-none" />
+        <div className="relative mx-auto max-w-[1240px] px-8 py-12">
+          <div className="flex items-center gap-3">
+            <span className="inline-block h-2 w-2 rounded-full bg-jade cer-pulse-dot" />
+            <div className="font-serif text-[13px] tracking-[0.34em] text-vermilion">
+              历次鉴定 · 鉴定著录
+            </div>
           </div>
-          <h1 className="mt-4 font-serif text-5xl font-semibold tracking-[0.1em] text-ink">
+          <h1 className="mt-4 font-serif text-5xl font-bold tracking-[0.1em] cer-gradient-text cer-text-glow">
             著录堂
           </h1>
           <p className="mt-4 max-w-3xl font-sans text-[14px] leading-[1.9] text-ink-soft">
@@ -57,7 +61,7 @@ function HistoryPage() {
                 {analyses.map((item) => (
                   <article
                     key={item.id}
-                    className="cer-paper cer-corners p-5 flex flex-col gap-4"
+                    className="cer-paper cer-corners p-5 flex flex-col gap-4 cer-glow-hover"
                   >
                     <Link
                       to="/analyze/$id"

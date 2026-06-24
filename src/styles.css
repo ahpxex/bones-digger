@@ -294,3 +294,219 @@ body {
   outline: 2px solid var(--color-vermilion);
   outline-offset: 2px;
 }
+
+/* ========== Competition-grade flashy effects ========== */
+
+/* Gradient text — 故宫红 → 青铜金 gradient */
+.cer-gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--color-vermilion) 0%,
+    var(--color-vermilion-bright) 35%,
+    var(--color-bronze) 70%,
+    var(--color-bronze-dark) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glow text shadow for headings */
+.cer-text-glow {
+  text-shadow:
+    0 0 30px rgba(157, 43, 51, 0.15),
+    0 0 60px rgba(184, 151, 102, 0.08);
+}
+
+/* Glow box for cards on hover */
+.cer-glow-hover {
+  transition: box-shadow 350ms ease, transform 350ms ease;
+}
+.cer-glow-hover:hover {
+  box-shadow:
+    0 4px 30px rgba(157, 43, 51, 0.12),
+    0 0 0 1px rgba(157, 43, 51, 0.2),
+    inset 0 0 30px rgba(184, 151, 102, 0.08);
+  transform: translateY(-3px);
+}
+
+/* Animated grid background — techy grid that slowly drifts */
+.cer-grid-bg {
+  background-image:
+    linear-gradient(rgba(184, 151, 102, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184, 151, 102, 0.07) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: grid-drift 40s linear infinite;
+}
+@keyframes grid-drift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 48px 48px, 48px 48px;
+  }
+}
+
+/* Radial spotlight that follows behind hero text */
+.cer-spotlight {
+  background: radial-gradient(
+    ellipse 60% 50% at 50% 40%,
+    rgba(157, 43, 51, 0.06) 0%,
+    rgba(184, 151, 102, 0.04) 35%,
+    transparent 70%
+  );
+}
+
+/* Floating animation for decorative elements */
+@keyframes cer-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1.5deg);
+  }
+}
+.cer-float {
+  animation: cer-float 6s ease-in-out infinite;
+}
+.cer-float-slow {
+  animation: cer-float 9s ease-in-out infinite;
+}
+
+/* Shimmer sweep across a surface — for badges / ribbons */
+@keyframes cer-shimmer {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+.cer-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.cer-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  animation: cer-shimmer 3.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* Pulse glow ring — for "live" indicators */
+@keyframes cer-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 107, 88, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(74, 107, 88, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 107, 88, 0);
+  }
+}
+.cer-pulse-dot {
+  animation: cer-pulse-ring 2s ease-out infinite;
+}
+
+/* Tech badge — pill with bronze border + subtle inner glow */
+.cer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.8rem;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--color-bronze-dark);
+  background: color-mix(in oklch, var(--color-paper) 80%, var(--color-bronze) 12%);
+  border: 1px solid color-mix(in oklch, var(--color-bronze) 50%, transparent);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+/* Big glow number — for stats */
+.cer-stat-num {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  background: linear-gradient(
+    180deg,
+    var(--color-vermilion-bright) 0%,
+    var(--color-vermilion) 60%,
+    var(--color-vermilion-deep) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(157, 43, 51, 0.15));
+}
+
+/* Pipeline node — hexagonal-ish rounded box */
+.cer-node {
+  position: relative;
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklch, var(--color-paper) 96%, white 4%) 0%,
+    color-mix(in oklch, var(--color-paper-warm) 80%, white 20%) 100%
+  );
+  border: 1px solid color-mix(in oklch, var(--color-bronze) 45%, transparent);
+  box-shadow:
+    0 1px 0 rgba(184, 151, 102, 0.3),
+    0 8px 24px -12px rgba(26, 26, 26, 0.1);
+}
+
+/* Animated dashed connector line */
+@keyframes cer-dash-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.cer-dash-anim {
+  stroke-dasharray: 6 4;
+  animation: cer-dash-flow 1s linear infinite;
+}
+
+/* Ribbon banner — for section dividers */
+.cer-ribbon {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--color-vermilion) 8%, transparent),
+    transparent
+  );
+}
+
+/* Scroll-in glow underline that draws on reveal */
+@keyframes cer-underline-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.cer-underline-draw::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin-top: 0.4rem;
+  background: linear-gradient(
+    90deg,
+    var(--color-vermilion),
+    var(--color-bronze),
+    transparent
+  );
+  transform-origin: left;
+  animation: cer-underline-draw 800ms ease-out 200ms forwards;
+}

@@ -1,0 +1,5 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <rect x="4" y="4" width="56" height="56" rx="3" fill="#9d2b33"/>
+  <rect x="7" y="7" width="50" height="50" rx="1.5" fill="none" stroke="#f5f1e8" stroke-width="0.8" opacity="0.25"/>
+  <text x="32" y="33" text-anchor="middle" dominant-baseline="central" font-family="STKaiti, KaiTi, STSong, Songti SC, serif" font-size="36" font-weight="700" fill="#f5f1e8">骨</text>
+</svg>
