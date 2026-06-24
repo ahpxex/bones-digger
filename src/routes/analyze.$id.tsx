@@ -68,7 +68,6 @@ function AnalyzePage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <SiteHeader />
       <main className="flex-1">
         <div className="mx-auto max-w-[1240px] px-8 py-8">
           <nav className="mb-6 flex items-center gap-3 text-[12px] tracking-[0.22em] text-ink-muted">
