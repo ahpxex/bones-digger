@@ -5,7 +5,16 @@ import { SectionTitle } from "@/components/ui/section-title";
 import { DemoGallery } from "@/components/upload/demo-gallery";
 import { DropZone } from "@/components/upload/drop-zone";
 import { SpecimenShowcase } from "@/components/splat/specimen-showcase";
+import { Reveal } from "@/components/ui/reveal";
+import { Counter } from "@/components/ui/counter";
 import { toChineseNumeral } from "@/lib/utils";
+
+const STATS = [
+  { to: 7, label: "覆盖物种", en: "Species" },
+  { to: 18, label: "鉴定骨位", en: "Bone positions" },
+  { to: 264, label: "专家特征", en: "Expert features" },
+  { to: 15, label: "古代品种", en: "Ancient breeds" },
+];
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
@@ -97,12 +106,36 @@ function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1240px] px-8 py-10">
-          <Frame tone="paper" className="p-8">
-            <DemoGallery />
-          </Frame>
-        </section>
+        {/* ===== data-scale band ===== */}
+        <Reveal>
+          <section className="border-y border-bronze/40 bg-paper-warm/40">
+            <div className="mx-auto grid max-w-[1240px] grid-cols-2 gap-8 px-8 py-12 md:grid-cols-4">
+              {STATS.map((s) => (
+                <div key={s.label} className="text-center">
+                  <div className="font-serif text-[44px] leading-none text-vermilion">
+                    <Counter to={s.to} />
+                  </div>
+                  <div className="mt-3 font-serif text-[14px] tracking-[0.24em] text-ink">
+                    {s.label}
+                  </div>
+                  <div className="mt-1 font-sans text-[10px] tracking-[0.22em] text-ink-muted uppercase">
+                    {s.en}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </Reveal>
 
+        <Reveal>
+          <section className="mx-auto max-w-[1240px] px-8 py-10">
+            <Frame tone="paper" className="p-8">
+              <DemoGallery />
+            </Frame>
+          </section>
+        </Reveal>
+
+        <Reveal>
         <section className="mx-auto max-w-[1240px] px-8 py-16">
           <SectionTitle
             numeral="叁 · 鉴定流程"
@@ -126,7 +159,9 @@ function HomePage() {
             ))}
           </div>
         </section>
+        </Reveal>
 
+        <Reveal>
         <section className="mx-auto max-w-[1240px] px-8 py-16">
           <SectionTitle
             numeral="肆 · 技术构成"
@@ -165,6 +200,7 @@ function HomePage() {
             </Frame>
           </div>
         </section>
+        </Reveal>
       </main>
       <SiteFooter />
     </div>
