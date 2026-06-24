@@ -20,13 +20,40 @@ import { ClientOnly } from "@/components/ui/client-only";
  * the viewer falls back to the procedural specimen (no breakage). See
  * `public/models/README.md`.
  */
-const SPECIMEN_MODELS: Record<string, string> = {
+// Species skulls (shown for 头骨 / 其他 / any unmapped position).
+const SPECIES_SKULLS: Record<string, string> = {
   马: "/models/horse.glb",
   黄牛: "/models/cattle.glb",
 };
 
-export function specimenModelFor(species: Species): string | undefined {
-  return SPECIMEN_MODELS[species];
+// Real bone scans (Carleton CARCAS alpaca skeleton) keyed by bone position — an
+// alpaca bone reads as a generic ungulate bone, close enough per position.
+const POSITION_MODELS: Partial<Record<BonePosition, string>> = {
+  距骨: "/models/astragalus.glb",
+  跟骨: "/models/calcaneus.glb",
+  掌骨: "/models/metacarpal.glb",
+  跖骨: "/models/metatarsal.glb",
+  趾骨: "/models/phalanx.glb",
+  尺骨: "/models/radius-ulna.glb",
+  桡骨: "/models/radius-ulna.glb",
+  股骨: "/models/femur.glb",
+  胫骨: "/models/tibia.glb",
+  肱骨: "/models/humerus.glb",
+  肩胛骨: "/models/scapula.glb",
+  寰椎: "/models/atlas.glb",
+  枢椎: "/models/axis.glb",
+  下颌: "/models/mandible.glb",
+  上颌: "/models/cranium.glb",
+  牙齿: "/models/mandible.glb",
+  齿式: "/models/mandible.glb",
+};
+
+export function specimenModelFor(
+  species: Species,
+  position?: BonePosition,
+): string | undefined {
+  if (position && POSITION_MODELS[position]) return POSITION_MODELS[position];
+  return SPECIES_SKULLS[species];
 }
 
 /** Falls back to the procedural mesh if a GLB fails to load (e.g. 404). */
@@ -159,7 +186,7 @@ export function SplatPreviewViewer({
           {hasGlb ? (
             <ModelBoundary fallback={fallback}>
               <Suspense fallback={fallback}>
-                <Bounds fit clip observe margin={1.15}>
+                <Bounds fit clip observe margin={0.65}>
                   <GlbModel url={glbUrl!} />
                 </Bounds>
               </Suspense>

@@ -246,7 +246,10 @@ function AnalyzePage() {
             </SectionTitle>
             <Frame tone="paper" className="mt-8 p-6">
               <SplatPreviewViewer
-                glbUrl={result.glbPath ?? specimenModelFor(result.verdict.species)}
+                glbUrl={
+                  result.glbPath ??
+                  specimenModelFor(result.verdict.species, result.verdict.position)
+                }
                 reconstruction={Boolean(result.glbPath)}
                 species={result.verdict.species}
                 position={result.verdict.position}

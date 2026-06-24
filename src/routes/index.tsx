@@ -125,9 +125,9 @@ function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-center">
               <div className="lg:col-span-3">
                 <SplatPreviewViewer
-                  glbUrl={specimenModelFor("马")}
+                  glbUrl={specimenModelFor("马", "头骨")}
                   species="马"
-                  position="股骨"
+                  position="头骨"
                 />
               </div>
               <div className="lg:col-span-2">
