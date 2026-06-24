@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { selectProvider } from "@/lib/ai/provider";
 import { retrieveKnowledge } from "@/lib/ai/rag";
 import { segmentBoneSubject } from "@/lib/ai/sam";
@@ -149,7 +150,8 @@ export const analyzeDemo = createServerFn({ method: "POST" })
     return { demoId: data.demoId };
   })
   .handler(async ({ data }) => {
-    const bytes = await readDemoFile(data.demoId);
+    const origin = new URL(getRequest().url).origin;
+    const bytes = await readDemoFile(data.demoId, origin);
     if (!bytes) {
       throw new Error(`未找到 demo 标本：${data.demoId}`);
     }
