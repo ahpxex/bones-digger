@@ -179,7 +179,7 @@ function HomePage() {
                 同一模型开启 thinking 深度推理，用于低置信度样本、疑似跨物种相似样本与争议结果。输出可审计的思维链与多步证据（按需启用）。
               </p>
               <div className="mt-6 text-[12px] tracking-[0.22em] text-ink-muted">
-                Precision ~ 97%+ · 可回溯
+                证据可回溯 · 思维链可审计
               </div>
             </Frame>
           </div>

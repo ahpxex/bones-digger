@@ -9,7 +9,7 @@ import { EvidenceChain } from "@/components/result/evidence-chain";
 import { ImageTriptych } from "@/components/result/image-triptych";
 import { KnowledgeCardGrid } from "@/components/result/knowledge-card-grid";
 import { ReasoningPanel } from "@/components/result/reasoning-panel";
-import { SplatPreviewViewer } from "@/components/splat/viewer-preview";
+import { SplatPreviewViewer, specimenModelFor } from "@/components/splat/viewer-preview";
 import { getAnalysis } from "@/server/data";
 import { deleteAnalysisFn } from "@/server/analyze";
 import { formatTimestamp } from "@/lib/utils";
@@ -246,18 +246,16 @@ function AnalyzePage() {
             </SectionTitle>
             <Frame tone="paper" className="mt-8 p-6">
               <SplatPreviewViewer
-                glbUrl={result.glbPath}
+                glbUrl={result.glbPath ?? specimenModelFor(result.verdict.species)}
+                reconstruction={Boolean(result.glbPath)}
                 species={result.verdict.species}
                 position={result.verdict.position}
               />
               {!result.glbPath && (
                 <div className="mt-4 font-sans text-[11px] tracking-[0.22em] text-ink-muted">
-                  本标本根据鉴定结论（
-                  <span className="text-vermilion">
-                    {result.verdict.species}·{result.verdict.position}
-                  </span>
-                  ）从数字标本馆实时生成；接入 SAM 3D 在线重建请配置{" "}
-                  <code className="font-mono text-bronze-dark">SAM3D_PROVIDER</code>。
+                  依据鉴定结论展示
+                  <span className="text-vermilion"> {result.verdict.species} </span>
+                  物种三维模型，可拖拽旋转查看。
                 </div>
               )}
             </Frame>

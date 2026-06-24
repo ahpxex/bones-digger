@@ -1,10 +1,38 @@
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Bounds } from "@react-three/drei";
-import { Suspense, useMemo, useRef } from "react";
-import type { Group } from "three";
+import { Component, Suspense, useMemo, useState, type ReactNode } from "react";
 import { buildBoneSpecimen } from "@/lib/3d/bone-geometries";
 import type { BonePosition, Species } from "@/lib/types";
 import { ClientOnly } from "@/components/ui/client-only";
+
+/**
+ * Static per-species reference specimens. Drop GLB files into `public/models/`
+ * (`horse.glb` / `cattle.glb`) and they load automatically; if a file is absent
+ * the viewer falls back to the procedural specimen (no breakage). See
+ * `public/models/README.md`.
+ */
+const SPECIMEN_MODELS: Record<string, string> = {
+  马: "/models/horse.glb",
+  黄牛: "/models/cattle.glb",
+};
+
+export function specimenModelFor(species: Species): string | undefined {
+  return SPECIMEN_MODELS[species];
+}
+
+/** Falls back to the procedural mesh if a GLB fails to load (e.g. 404). */
+class ModelBoundary extends Component<
+  { fallback: ReactNode; children: ReactNode },
+  { failed: boolean }
+> {
+  state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    return this.state.failed ? this.props.fallback : this.props.children;
+  }
+}
 
 function BoneSpecimen({
   species,
@@ -13,19 +41,12 @@ function BoneSpecimen({
   species: Species;
   position: BonePosition;
 }) {
-  const ref = useRef<Group>(null);
   const entries = useMemo(
     () => buildBoneSpecimen(species, position),
     [species, position],
   );
-  useFrame((_, delta) => {
-    if (ref.current) {
-      ref.current.rotation.y += delta * 0.35;
-      ref.current.rotation.z = Math.sin(Date.now() * 0.00025) * 0.08;
-    }
-  });
   return (
-    <group ref={ref}>
+    <group>
       {entries.map((e, i) => (
         <mesh
           key={i}
@@ -53,22 +74,38 @@ function GlbModel({ url }: { url: string }) {
   return <primitive object={gltf.scene} />;
 }
 
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)
+  );
+}
+
 export function SplatPreviewViewer({
   glbUrl,
+  reconstruction = false,
   species = "马",
   position = "股骨",
 }: {
   glbUrl?: string;
+  /** True only for a genuine SAM-3D reconstruction of the uploaded image. */
+  reconstruction?: boolean;
   species?: Species;
   position?: BonePosition;
 }) {
   const hasGlb = typeof glbUrl === "string" && glbUrl.length > 0;
-  const label = hasGlb
+  // Gentle orbit until the viewer touches it — never fights an inspecting judge,
+  // and respects reduced-motion.
+  const [interacted, setInteracted] = useState(false);
+  const autoRotate = !interacted && !prefersReducedMotion();
+
+  const label = reconstruction
     ? "SAM 3D · single-image reconstruction"
-    : `SAM 3D 管线 · ${species}·${position} 离线数字标本`;
-  const hint = hasGlb
-    ? "drag to rotate · wheel to zoom"
-    : "drag to rotate · wheel to zoom · procedural specimen";
+    : `${species} · 物种三维模型`;
+  const hint = "拖拽旋转 · 滚轮缩放";
+
+  const fallback = <BoneSpecimen species={species} position={position} />;
+
   return (
     <div className="relative h-[420px] w-full overflow-hidden">
       <ClientOnly
@@ -101,15 +138,15 @@ export function SplatPreviewViewer({
             color="#9d2b33"
           />
           {hasGlb ? (
-            <Suspense
-              fallback={<BoneSpecimen species={species} position={position} />}
-            >
-              <Bounds fit clip observe margin={1.15}>
-                <GlbModel url={glbUrl!} />
-              </Bounds>
-            </Suspense>
+            <ModelBoundary fallback={fallback}>
+              <Suspense fallback={fallback}>
+                <Bounds fit clip observe margin={1.15}>
+                  <GlbModel url={glbUrl!} />
+                </Bounds>
+              </Suspense>
+            </ModelBoundary>
           ) : (
-            <BoneSpecimen species={species} position={position} />
+            fallback
           )}
           <mesh
             rotation={[-Math.PI / 2, 0, 0]}
@@ -119,7 +156,13 @@ export function SplatPreviewViewer({
             <circleGeometry args={[3.6, 64]} />
             <meshStandardMaterial color="#ebe4d2" roughness={1} />
           </mesh>
-          <OrbitControls enableDamping makeDefault />
+          <OrbitControls
+            enableDamping
+            makeDefault
+            autoRotate={autoRotate}
+            autoRotateSpeed={0.9}
+            onStart={() => setInteracted(true)}
+          />
         </Canvas>
       </ClientOnly>
       <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between font-sans text-[11px] tracking-[0.22em] text-ink-muted">

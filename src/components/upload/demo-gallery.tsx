@@ -34,7 +34,7 @@ export function DemoGallery() {
             贰 · 试用现有标本
           </div>
           <div className="mt-1 font-sans text-[12px] tracking-[0.22em] text-ink-muted">
-            自馆藏 300 张马牛标本库中抽取 {entries.length} 张作为示例，点击任意一张即刻鉴定
+            精选 {entries.length} 件马 / 黄牛标本，点击任意一张即刻鉴定
           </div>
         </div>
       </div>
