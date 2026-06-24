@@ -133,6 +133,8 @@ export function SplatPreviewViewer({
   species = "马",
   position = "股骨",
   heightClass = "h-[420px]",
+  autoRotateAlways = false,
+  fitMargin = 0.65,
 }: {
   glbUrl?: string;
   /** True only for a genuine SAM-3D reconstruction of the uploaded image. */
@@ -140,12 +142,17 @@ export function SplatPreviewViewer({
   species?: Species;
   position?: BonePosition;
   heightClass?: string;
+  /** Keep rotating as a showcase even after the user interacts. */
+  autoRotateAlways?: boolean;
+  /** Bounds fit margin — higher = the model appears smaller / more padded. */
+  fitMargin?: number;
 }) {
   const hasGlb = typeof glbUrl === "string" && glbUrl.length > 0;
-  // Gentle orbit until the viewer touches it — never fights an inspecting judge,
-  // and respects reduced-motion.
+  // Gentle orbit — by default until the viewer touches it (so it never fights an
+  // inspecting judge); as a showcase (autoRotateAlways) it keeps spinning.
   const [interacted, setInteracted] = useState(false);
-  const autoRotate = !interacted && !prefersReducedMotion();
+  const autoRotate =
+    (autoRotateAlways || !interacted) && !prefersReducedMotion();
 
   const label = reconstruction
     ? "SAM 3D · single-image reconstruction"
@@ -188,7 +195,7 @@ export function SplatPreviewViewer({
           {hasGlb ? (
             <ModelBoundary fallback={fallback}>
               <Suspense fallback={fallback}>
-                <Bounds fit clip observe margin={0.65}>
+                <Bounds fit clip observe margin={fitMargin}>
                   <GlbModel url={glbUrl!} />
                 </Bounds>
               </Suspense>

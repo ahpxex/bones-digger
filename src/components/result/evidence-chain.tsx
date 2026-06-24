@@ -11,7 +11,7 @@ export function EvidenceChain({
   onHover?: (key: string | null) => void;
 }) {
   return (
-    <ol className="flex flex-col gap-6">
+    <ol className="flex flex-col gap-5">
       {evidence.map((item, i) => {
         const hasRegion = Boolean(item.region);
         const isActive = activeKey != null && item.key === activeKey;
@@ -20,22 +20,20 @@ export function EvidenceChain({
             key={item.id}
             onMouseEnter={() => hasRegion && onHover?.(item.key)}
             onMouseLeave={() => hasRegion && onHover?.(null)}
-            className={`cer-entry grid grid-cols-1 md:grid-cols-[auto_1fr] gap-x-6 gap-y-2 -mx-3 px-3 py-2 border-l-2 transition-all ${
-              isActive
-                ? "border-vermilion bg-paper-warm"
-                : "border-transparent"
+            className={`cer-entry -mx-3 flex flex-col gap-3 border-l-2 px-4 py-3 transition-all ${
+              isActive ? "border-vermilion bg-paper-warm" : "border-transparent"
             } ${hasRegion ? "cursor-pointer" : ""}`}
           >
-            <div className="md:col-span-2 flex items-baseline gap-4">
-              <span className="font-serif text-[14px] tracking-[0.3em] text-vermilion">
+            <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="font-serif text-[14px] tracking-[0.28em] text-vermilion">
                 第 {toChineseNumeral(i + 1)} 条
               </span>
-              <span className="font-serif text-[17px] font-semibold tracking-[0.1em] text-ink">
+              <span className="font-serif text-[17px] font-semibold tracking-[0.08em] text-ink">
                 {item.key}
               </span>
               {hasRegion && (
                 <span
-                  className={`font-sans text-[10px] tracking-[0.18em] px-1.5 py-[1px] border ${
+                  className={`font-sans text-[10px] tracking-[0.16em] px-1.5 py-[1px] border ${
                     isActive
                       ? "border-vermilion bg-vermilion text-paper"
                       : "border-bronze/50 text-bronze-dark"
@@ -49,6 +47,7 @@ export function EvidenceChain({
                 权重 {(item.weight * 100).toFixed(0)}%
               </span>
             </div>
+
             <div className="flex flex-col gap-1">
               <span className="font-serif text-[11px] tracking-[0.28em] text-ink-muted">
                 图像观察
@@ -57,7 +56,8 @@ export function EvidenceChain({
                 {item.observation}
               </p>
             </div>
-            <div className="flex flex-col gap-1">
+
+            <div className="flex flex-col gap-1 border-l-2 border-bronze/30 pl-4">
               <span className="font-serif text-[11px] tracking-[0.28em] text-ink-muted">
                 专家特征
               </span>
