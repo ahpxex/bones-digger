@@ -1,6 +1,15 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Bounds } from "@react-three/drei";
-import { Component, Suspense, useMemo, useState, type ReactNode } from "react";
+import { OrbitControls, useGLTF, useAnimations, Bounds } from "@react-three/drei";
+import {
+  Component,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import type { Group } from "three";
 import { buildBoneSpecimen } from "@/lib/3d/bone-geometries";
 import type { BonePosition, Species } from "@/lib/types";
 import { ClientOnly } from "@/components/ui/client-only";
@@ -70,8 +79,18 @@ function BoneSpecimen({
 }
 
 function GlbModel({ url }: { url: string }) {
-  const gltf = useGLTF(url);
-  return <primitive object={gltf.scene} />;
+  const group = useRef<Group>(null);
+  const { scene, animations } = useGLTF(url);
+  const { actions, names } = useAnimations(animations, group);
+  // Rigged sample models (e.g. the three.js horse) look like a collapsed blob
+  // in their static bind pose — play the first clip so they read correctly.
+  useEffect(() => {
+    const first = names[0];
+    if (first && actions[first]) {
+      actions[first].reset().play();
+    }
+  }, [actions, names]);
+  return <primitive ref={group} object={scene} />;
 }
 
 function prefersReducedMotion(): boolean {
