@@ -15,6 +15,8 @@ const TABS: Array<{ key: Filter; zh: string; en: string }> = [
   { key: "Equidae", zh: "马科", en: "Equidae" },
 ];
 
+const RADAR_LABELS = BREED_DIMENSION_LABELS.map((d) => ({ zh: d.zh, en: d.en }));
+
 export function BreedCodex() {
   const [filter, setFilter] = useState<Filter>("all");
 
@@ -65,7 +67,10 @@ export function BreedCodex() {
         })}
       </div>
 
-      <div key={filter} className="cer-panel-in mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <div
+        key={filter}
+        className="cer-panel-in mt-8 flex flex-col gap-7"
+      >
         {breeds.map((breed) => (
           <BreedCard key={breed.id} breed={breed} maxDim={maxDim} />
         ))}
@@ -74,76 +79,146 @@ export function BreedCodex() {
   );
 }
 
-function BreedCard({ breed, maxDim }: { breed: AncientBreed; maxDim: number }) {
+function BreedCard({
+  breed,
+  maxDim,
+}: {
+  breed: AncientBreed;
+  maxDim: number;
+}) {
+  const [active, setActive] = useState(0);
   const values = BREED_DIMENSION_LABELS.map(
     (d) => breed.dimensions[d.key].length,
   );
   const total = values.reduce((a, b) => a + b, 0);
+  const dim = BREED_DIMENSION_LABELS[active]!;
+  const items = breed.dimensions[dim.key];
 
   return (
-    <article className="cer-paper cer-corners cer-glow-hover relative overflow-hidden p-7">
-      <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 cer-spotlight" />
+    <article className="cer-paper cer-corners cer-glow-hover relative overflow-hidden p-6 sm:p-8">
+      <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 cer-spotlight" />
+      <div className="pointer-events-none absolute inset-0 cer-grid-bg opacity-[0.18]" />
 
+      {/* header */}
       <header className="relative flex items-start justify-between gap-4">
         <div>
           <div className="font-serif text-[11px] tracking-[0.3em] text-bronze">
             {breed.taxaZh} · {breed.group}
           </div>
-          <h3 className="mt-2 font-serif text-[24px] font-semibold tracking-[0.1em] text-ink">
+          <h3 className="mt-2 font-serif text-[26px] font-semibold tracking-[0.08em] text-ink cer-heading-underline">
             {breed.name}
           </h3>
-          <div className="mt-1 font-sans text-[12px] tracking-[0.16em] text-ink-muted">
+          <div className="mt-3 font-sans text-[12px] tracking-[0.16em] text-ink-muted">
             {breed.nameEn}
             {breed.latin && <span className="ml-2 italic">· {breed.latin}</span>}
           </div>
         </div>
-
-        {/* dimension-density radar */}
-        <div className="relative shrink-0 text-center">
-          <HexRadar values={values} max={maxDim} size={116} />
-          <div className="-mt-1 font-sans text-[10px] tracking-[0.18em] text-ink-muted">
-            档案密度 · <span className="text-vermilion">{total}</span> 条
+        <div className="relative shrink-0 text-right">
+          <div className="cer-stat-num text-[34px] leading-none">{total}</div>
+          <div className="mt-1.5 font-sans text-[9px] tracking-[0.22em] text-ink-muted uppercase">
+            Archive facts
+          </div>
+          <div className="mt-0.5 font-serif text-[10.5px] tracking-[0.2em] text-bronze-dark">
+            档案总条目
           </div>
         </div>
       </header>
 
-      <div className="cer-rule my-4" />
+      <div className="cer-rule my-6" />
 
-      <dl className="grid grid-cols-1 gap-x-7 gap-y-5 md:grid-cols-2">
-        {BREED_DIMENSION_LABELS.map(({ key, zh, en }) => (
-          <div key={key}>
-            <dt className="flex items-center gap-2.5">
-              <span className="text-vermilion">
-                <DimensionIcon name={key} />
-              </span>
-              <span className="font-serif text-[14px] font-semibold tracking-[0.1em] text-ink">
-                {zh}
-              </span>
-              <span className="font-sans text-[10px] tracking-[0.16em] text-ink-muted">
-                {en}
-              </span>
-            </dt>
-            <dd className="mt-2">
-              <ul className="space-y-1.5 text-[12px] leading-[1.8] text-ink-soft">
-                {breed.dimensions[key].map((item, i) => (
-                  <li key={i} className="flex gap-2">
-                    <span className="mt-[3px] inline-block h-1 w-1 shrink-0 rounded-full bg-bronze" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </dd>
+      {/* body: radar + linked detail panel */}
+      <div className="relative grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,400px)_1fr] lg:gap-10">
+        {/* radar stage */}
+        <div className="relative flex items-center justify-center">
+          <div className="pointer-events-none absolute inset-0 -m-6 cer-conic rounded-full opacity-40" />
+          <div className="relative">
+            <HexRadar
+              values={values}
+              labels={RADAR_LABELS}
+              max={maxDim}
+              size={380}
+              activeIndex={active}
+              onChange={setActive}
+            />
+            <div className="pointer-events-none mt-1 text-center font-sans text-[10px] tracking-[0.24em] text-ink-muted uppercase">
+              Hover a vertex · 六维档案
+            </div>
           </div>
-        ))}
-      </dl>
+        </div>
+
+        {/* detail panel — keyed on active so it re-animates per switch */}
+        <div
+          key={active}
+          className="cer-panel-in relative flex flex-col rounded-sm border border-bronze/30 bg-paper-warm/40 p-5 sm:p-6"
+        >
+          <div className="pointer-events-none absolute -left-px top-0 h-full w-[3px] bg-vermilion/70" />
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-full border border-vermilion/40 bg-vermilion/8 text-vermilion">
+              <DimensionIcon name={dim.key} />
+            </span>
+            <div>
+              <div className="font-serif text-[20px] font-semibold tracking-[0.1em] text-ink">
+                {dim.zh}
+              </div>
+              <div className="font-sans text-[10.5px] tracking-[0.2em] text-ink-muted uppercase">
+                {dim.en}
+              </div>
+            </div>
+            <span className="cer-badge ml-auto !text-vermilion !border-vermilion/40 !bg-vermilion/5">
+              {items.length} 条档案
+            </span>
+          </div>
+
+          <div className="cer-rule my-4 opacity-60" />
+
+          <ul className="flex flex-col gap-3">
+            {items.map((item, i) => (
+              <li
+                key={i}
+                className="flex gap-3 text-[13px] leading-[1.85] text-ink-soft"
+              >
+                <span className="mt-[6px] inline-block h-[18px] w-[18px] shrink-0 rounded-full border border-bronze/50 bg-paper-warm text-center font-serif text-[10px] leading-[17px] text-bronze-dark">
+                  {i + 1}
+                </span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+
+          {/* dimension switcher chips */}
+          <div className="mt-5 flex flex-wrap gap-1.5 border-t border-bronze/20 pt-4">
+            {BREED_DIMENSION_LABELS.map((d, i) => {
+              const on = i === active;
+              return (
+                <button
+                  key={d.key}
+                  data-on={on}
+                  onClick={() => setActive(i)}
+                  onMouseEnter={() => setActive(i)}
+                  className={`cer-rail-item rounded-full border px-3 py-1.5 font-serif text-[12px] tracking-[0.1em] transition-colors ${
+                    on
+                      ? "border-vermilion/50 bg-vermilion/10 text-vermilion"
+                      : "border-bronze/30 text-ink-muted hover:text-ink"
+                  }`}
+                >
+                  {d.zh}
+                  <span className="ml-1 font-sans text-[10px] text-bronze-dark">
+                    {values[i]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </article>
   );
 }
 
 function DimensionIcon({ name }: { name: string }) {
   const common = {
-    width: 16,
-    height: 16,
+    width: 18,
+    height: 18,
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
