@@ -1,6 +1,6 @@
-# 3D 物种模型 (species 3D models)
+# 3D 数字标本模型 (digital specimen models)
 
-The result-page 3D viewer loads a per-species GLB from this folder:
+The result page + homepage showcase load a per-species GLB from this folder:
 
 - `horse.glb`  → shown when the verdict is **马** (horse)
 - `cattle.glb` → shown when the verdict is **黄牛** (cattle)
@@ -9,22 +9,26 @@ If a file is missing/fails to load, the viewer falls back to the built-in
 procedural bone mesh — nothing breaks. Wired in
 `src/components/splat/viewer-preview.tsx`.
 
-## Currently bundled (auto-downloaded)
+## Currently bundled (real photogrammetry scans)
 
-- `horse.glb`  — the classic three.js sample horse (animated), from
-  `mrdoob/three.js` `examples/models/gltf/Horse.glb`.
-- `cattle.glb` — cow from Mozilla **Hubs** animal avatars
-  (`Hubs-Foundation/hubs-blender-files`).
+Real museum skull scans from Carleton College's **CARCAS** comparative-anatomy
+collection (`3dviewer.sites.carleton.edu/carcas`), optimized for the web with
+`@gltf-transform/cli` (textures → 1024px WebP, geometry quantized via
+KHR_mesh_quantization — both render with vanilla `useGLTF`, no extra decoder):
 
-These are stylized low-poly placeholders — fine for the demo, swappable anytime.
+- `horse.glb`  — **Horse Skull** (species-correct), ~14 MB
+- `cattle.glb` — **Goat Skull** (closest free bovid stand-in for cattle), ~7 MB
 
-## Swapping for a higher-fidelity model (≈1 min)
+Both are < 25 MB (Cloudflare Workers per-asset limit). The horse is
+species-perfect; the cattle is a bovid stand-in (no free cattle skull scan was
+directly downloadable).
 
-Download a **GLB** (keep it < ~15 MB for fast demo load) and overwrite the file:
+## Swapping for an even better / exact model (≈1 min)
+
+Download a **GLB** (< 25 MB) and overwrite the file:
 
 - Cattle skull — Sketchfab "Cow Skull": https://sketchfab.com/3d-models/cow-skull-83f4ee24948a4d338aad0afe1a3f41ed
-- Horse skeleton — Sketchfab "Horse Skeleton": https://sketchfab.com/3d-models/horse-skeleton-eaca504567604e879b8ab2cf2763025e
-- Smithsonian Open Access (CC0, no attribution): https://3d.si.edu
+- Smithsonian Open Access (CC0): https://3d.si.edu
 
-On Sketchfab: open model → **Download 3D Model** → choose **glTF/GLB** →
-rename to `horse.glb` / `cattle.glb` → replace here.
+If a downloaded model is > 25 MB, shrink it:
+`bunx @gltf-transform/cli optimize in.glb out.glb --texture-size 1024 --texture-compress webp --compress quantize`

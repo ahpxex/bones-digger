@@ -253,9 +253,9 @@ function AnalyzePage() {
               />
               {!result.glbPath && (
                 <div className="mt-4 font-sans text-[11px] tracking-[0.22em] text-ink-muted">
-                  依据鉴定结论展示
+                  依据鉴定结论调取
                   <span className="text-vermilion"> {result.verdict.species} </span>
-                  物种三维模型，可拖拽旋转查看。
+                  三维骨骼标本（真实扫描），可拖拽旋转查看。
                 </div>
               )}
             </Frame>

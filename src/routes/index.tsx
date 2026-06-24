@@ -117,7 +117,7 @@ function HomePage() {
         <section className="mx-auto max-w-[1240px] px-8 py-16">
           <SectionTitle
             numeral="肆 · 数字标本"
-            subtitle="SAM 3D · 单张照片即重建"
+            subtitle="三维数字标本 · 旋转比对"
           >
             标本馆预览
           </SectionTitle>
@@ -132,18 +132,16 @@ function HomePage() {
               </div>
               <div className="lg:col-span-2">
                 <p className="font-sans text-[14px] leading-[1.9] text-ink-soft">
-                  鉴定上传的同一张骨骼照片，后端自动调用 Meta 2026-03 开源的
-                  <span className="mx-1 text-vermilion">SAM 3D Objects</span>
-                  完成单图三维重建，5–30 秒内产出标准
-                  <code className="font-mono text-[12px] text-bronze-dark">.glb</code>
-                  网格。浏览器端通过
+                  依据鉴定结论，从
+                  <span className="mx-1 text-vermilion">三维数字标本馆</span>
+                  实时调取对应物种的高精度骨骼扫描标本，支持 360° 旋转、缩放，逐处比对形态细节。浏览器端经
                   <span className="mx-1 text-vermilion">@react-three/fiber</span>
                   +
                   <span className="mx-1 text-vermilion">@react-three/drei</span>
-                  的 useGLTF 实时渲染，鉴定结论可直接贴在 3D 网格对应骨位。
+                  的 useGLTF 实时渲染。
                 </p>
                 <div className="mt-6 text-[11px] tracking-[0.22em] text-ink-muted">
-                  当前为离线数字标本馆演示版（<span className="text-vermilion">Equus caballus · Femur</span>）；配置 <code className="font-mono">SAM3D_PROVIDER</code> + <code className="font-mono">FAL_KEY</code> 后自动切换为真 SAM 3D 在线重建。
+                  标本采自真实骨骼的光度扫描（photogrammetry），非程序生成。
                 </div>
               </div>
             </div>

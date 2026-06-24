@@ -120,7 +120,7 @@ export function SplatPreviewViewer({
 
   const label = reconstruction
     ? "SAM 3D · single-image reconstruction"
-    : `${species} · 物种三维模型`;
+    : `${species} · 三维数字标本`;
   const hint = "拖拽旋转 · 滚轮缩放";
 
   const fallback = <BoneSpecimen species={species} position={position} />;
